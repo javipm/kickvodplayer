@@ -3,11 +3,9 @@ import type { Video } from '..'
 import VideoJsPlayer from './VideoJS'
 
 export default function Videos() {
-  const [videos, setVideos] = useState([])
-  const [uri, setUri] = useState('')
-  const [poster, setPoster] = useState('')
-
-  const playerRef = useRef(null)
+  const [videos, setVideos] = useState<Video[]>([])
+  const [uri, setUri] = useState<string>('')
+  const [poster, setPoster] = useState<string>('')
 
   const videoJsOptions = {
     autoplay: false,
@@ -51,7 +49,7 @@ export default function Videos() {
       })
   }
 
-  const secondsToHms = (d) => {
+  const secondsToHms = (d: number) => {
     d = Number(d) / 1000
     var h = Math.floor(d / 3600)
     var m = Math.floor((d % 3600) / 60)

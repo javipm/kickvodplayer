@@ -1,0 +1,11 @@
+---
+import Layout from '../layouts/Layout.astro'
+import Card from '../components/Card.astro'
+import Videos from '../components/Videos'
+---
+
+<Layout title='Welcome to Astro.'>
+  <div class='grid place-items-center h-screen text-white'>
+    <Videos client:load />
+  </div>
+</Layout>

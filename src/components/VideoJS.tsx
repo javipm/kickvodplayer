@@ -2,7 +2,11 @@ import { useEffect, useRef } from 'react'
 import videojs from 'video.js'
 import 'video.js/dist/video-js.css'
 
-export default function VideoJS(props) {
+export default function VideoJS(props: {
+  source: any
+  options: any
+  onReady?: any
+}) {
   const videoRef = useRef(null)
   const playerRef = useRef(null)
   const { options, onReady } = props

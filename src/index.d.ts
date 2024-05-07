@@ -164,6 +164,8 @@ export interface Category3 {
 }
 
 export interface Video {
+  video: any
+  thumbnail: any
   id: number
   live_stream_id: number
   slug: any

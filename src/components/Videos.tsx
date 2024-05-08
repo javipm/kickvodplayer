@@ -14,6 +14,7 @@ export default function Videos({
   const [videoUuid, setVideoUuid] = useState<string>('')
   const [poster, setPoster] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(true)
+  const [progress, setProgress] = useState<Array<any>>([])
 
   const videoJsOptions = {
     autoplay: false,
@@ -43,6 +44,14 @@ export default function Videos({
           setVideos(data.previous_livestreams)
           setLoading(false)
         })
+
+      if (userIsLogged) {
+        fetch(`/api/progress/get`)
+          .then((response) => response.json())
+          .then((data) => {
+            setProgress(data)
+          })
+      }
     }, 1000)
 
     return () => clearTimeout(getVideos)
@@ -97,7 +106,15 @@ export default function Videos({
 
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 '>
         {(videos as Array<Video>).map((video: any) => {
-          const progress = 50
+          const progressVideo = progress.find(
+            (item: any) => item.videoId === video.video.uuid
+          )?.progress
+
+          const duration = video.duration
+          let progressPercentage = 0
+
+          if (progressVideo)
+            progressPercentage = (progressVideo / duration) * 100
           return (
             <article key={video.id} className='cursor-pointer'>
               <div className='relative' onClick={() => getVideo(video.id)}>
@@ -107,8 +124,8 @@ export default function Videos({
                   className='aspect-video object-cover'
                 />
                 <div
-                  className='absolute bottom-0 left-0 h-2 w-full bg-green-500'
-                  style={{ width: `${progress}%` }}
+                  className='absolute bottom-0 left-0 h-1 w-full bg-green-500'
+                  style={{ width: `${progressPercentage}%` }}
                 ></div>
                 <span className='absolute text-white bg-green-500 top-0 p-1 text-sm'>
                   {secondsToHms(video.duration)}

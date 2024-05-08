@@ -8,7 +8,10 @@ const session = await getSession(Astro.request)
 const userIsLogged = session !== null
 ---
 
-<Layout title='Kick VOD Player'>
+<Layout
+  title='Kick VODs Player'
+  description='SA simple video player for Kick VODs'
+>
   <main class='p-5 lg:p-10'>
     <Home client:load userIsLogged={userIsLogged} />
   </main>

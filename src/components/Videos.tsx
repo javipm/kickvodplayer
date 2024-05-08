@@ -26,6 +26,12 @@ export default function Videos({
         src: uri,
       },
     ],
+    plugins: {
+      hotkeys: {
+        volumeStep: 0.1,
+        seekStep: 30,
+      },
+    },
   }
 
   useEffect(() => {
@@ -76,7 +82,7 @@ export default function Videos({
   return videos && videos.length > 0 ? (
     <section>
       {uri ? (
-        <div className='grid p-10 place-items-center'>
+        <div className='grid pt-10 lg:pt-10 place-items-center'>
           <VideoJsPlayer
             source={uri}
             options={videoJsOptions}
@@ -85,7 +91,11 @@ export default function Videos({
           />
         </div>
       ) : null}
-      <div className='grid grid-cols-3 gap-4 p-10'>
+      <h2 className='text-green-500 text-center text-3xl font-bold my-10'>
+        List of VODs from {streamer}
+      </h2>
+
+      <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 '>
         {(videos as Array<Video>).map((video: any) => {
           const progress = 50
           return (

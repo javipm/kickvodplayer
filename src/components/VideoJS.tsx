@@ -1,6 +1,12 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import videojs from 'video.js'
 import 'video.js/dist/video-js.css'
+import qualitySelector from 'jb-videojs-hls-quality-selector'
+import 'videojs-mobile-ui/dist/videojs-mobile-ui.css'
+import 'videojs-mobile-ui'
+import 'videojs-hotkeys'
+import 'videojs-seek-buttons'
+import 'videojs-seek-buttons/dist/videojs-seek-buttons.css'
 import type Player from 'video.js/dist/types/player'
 
 const PROGRESS_INTERVAL_SECONDS = 60
@@ -59,8 +65,15 @@ export default function VideoJS(props: {
     const player = playerRef.current
 
     if (player) {
-      player.hlsQualitySelector({
-        displayCurrentQuality: true,
+      player.hlsQualitySelector({ displayCurrentQuality: true })
+      player.mobileUi({
+        touchControls: {
+          tapTimeout: 100,
+        },
+      })
+      player.seekButtons({
+        forward: 30,
+        back: 10,
       })
     }
   }, [playerRef])
@@ -98,7 +111,7 @@ export default function VideoJS(props: {
   }, [playerRef])
 
   return (
-    <div data-vjs-player className='h-auto w-2/3'>
+    <div data-vjs-player className='h-auto w-full lg:w-2/3'>
       <div ref={videoRef} />
     </div>
   )

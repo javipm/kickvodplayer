@@ -2,9 +2,16 @@ import { useEffect, useState } from 'react'
 import type { Video } from '..'
 import VideoJsPlayer from './VideoJS'
 
-export default function Videos({ streamer }: { streamer: string }) {
+export default function Videos({
+  streamer,
+  userIsLogged,
+}: {
+  streamer: string
+  userIsLogged: boolean
+}) {
   const [videos, setVideos] = useState<Video[]>([])
   const [uri, setUri] = useState<string>('')
+  const [videoUuid, setVideoUuid] = useState<string>('')
   const [poster, setPoster] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(true)
 
@@ -50,6 +57,7 @@ export default function Videos({ streamer }: { streamer: string }) {
         const source = data.source
         setUri(source)
         setPoster(video.thumbnail.src)
+        setVideoUuid(video.video.uuid)
       })
   }
 
@@ -69,7 +77,12 @@ export default function Videos({ streamer }: { streamer: string }) {
     <section>
       {uri ? (
         <div className='grid p-10 place-items-center'>
-          <VideoJsPlayer source={uri} options={videoJsOptions} />
+          <VideoJsPlayer
+            source={uri}
+            options={videoJsOptions}
+            videoUuid={videoUuid}
+            userIsLogged={userIsLogged}
+          />
         </div>
       ) : null}
       <div className='grid grid-cols-3 gap-4 p-10'>

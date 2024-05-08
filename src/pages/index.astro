@@ -1,10 +1,15 @@
 ---
 import Layout from '../layouts/Layout.astro'
 import Home from 'src/components/Home'
+
+import { getSession } from 'auth-astro/server'
+
+const session = await getSession(Astro.request)
+const userIsLogged = session !== null
 ---
 
 <Layout title='Kick VOD Player'>
   <main class='p-10'>
-    <Home client:load />
+    <Home client:load userIsLogged={userIsLogged} />
   </main>
 </Layout>

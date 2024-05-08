@@ -3,19 +3,39 @@ import videojs from 'video.js'
 import 'video.js/dist/video-js.css'
 import type Player from 'video.js/dist/types/player'
 
+const PROGRESS_INTERVAL_SECONDS = 60
+
 export default function VideoJS(props: {
   source: any
   options: any
+  videoUuid: string
+  userIsLogged: boolean
   onReady?: any
 }) {
   const videoRef = useRef<HTMLDivElement | null>(null)
   const playerRef = useRef<Player | null>(null)
-  const { options, onReady } = props
+  const { options, onReady, videoUuid, userIsLogged } = props
+
+  const saveProgress = () => {
+    if (!userIsLogged) return
+
+    console.log('Saving progress...')
+    const player = playerRef.current
+
+    const progress = player?.currentTime() * 1000
+    fetch(`/api/progress/${videoUuid}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        progress,
+      }),
+    })
+  }
 
   useEffect(() => {
-    // Make sure Video.js player is only initialized once
     if (!playerRef.current) {
-      // The Video.js player needs to be _inside_ the component el for React 18 Strict Mode.
       const videoElement = document.createElement('video-js')
 
       videoElement.classList.add('vjs-big-play-centered')
@@ -24,12 +44,8 @@ export default function VideoJS(props: {
       }
 
       const player = (playerRef.current = videojs(videoElement, options, () => {
-        videojs.log('player is ready')
         onReady && onReady(player)
       }))
-
-      // You could update an existing player in the `else` block here
-      // on prop change, for example:
     } else {
       const player = playerRef.current
 
@@ -38,11 +54,31 @@ export default function VideoJS(props: {
     }
   }, [options, videoRef])
 
-  // Dispose the Video.js player when the functional component unmounts
   useEffect(() => {
+    let intervalId: NodeJS.Timeout | null = null
+
     const player = playerRef.current
 
+    if (player) {
+      player.on('play', () => {
+        saveProgress()
+        intervalId = setInterval(() => {
+          saveProgress()
+        }, PROGRESS_INTERVAL_SECONDS * 1000)
+      })
+
+      player.on('pause', () => {
+        if (intervalId) {
+          clearInterval(intervalId)
+          intervalId = null
+        }
+      })
+    }
+
     return () => {
+      if (intervalId) {
+        clearInterval(intervalId)
+      }
       if (player && !player.isDisposed()) {
         player.dispose()
         playerRef.current = null

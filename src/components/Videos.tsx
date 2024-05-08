@@ -40,7 +40,7 @@ export default function Videos({
     },
     controlBar: {
       skipButtons: {
-        forward: 30,
+        forward: 10,
         backward: 10,
       },
     },

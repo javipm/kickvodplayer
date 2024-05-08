@@ -7,7 +7,7 @@ const generateUserId = (str: string) => {
   return createHash('sha256').update(str).digest('hex')
 }
 
-export const GET: APIRoute = async ({ params, request }) => {
+export const GET: APIRoute = async ({ request }) => {
   const session = await getSession(request)
 
   if (!session || session?.user?.email == null) {

@@ -38,12 +38,23 @@ export default function Videos({
   }
 
   useEffect(() => {
+    setVideos([])
+    setUri('')
+    setLoading(true)
+
     const getVideos = setTimeout(() => {
-      setLoading(true)
       fetch(`https://kick.com/api/v1/channels/${streamer}`)
-        .then((response) => response.json())
+        .then((response) => {
+          if (!response.ok) {
+            setLoading(false)
+          }
+          return response.json()
+        })
         .then((data) => {
           setVideos(data.previous_livestreams)
+          setLoading(false)
+        })
+        .catch((error) => {
           setLoading(false)
         })
 
@@ -148,8 +159,8 @@ export default function Videos({
       </div>
     </section>
   ) : loading ? (
-    <div>Loading...</div>
+    <div className='text-white pt-10 text-xl font-bold'>Loading...</div>
   ) : (
-    <div>No videos found</div>
+    <div className='text-white pt-10 text-xl font-bold'>No videos found</div>
   )
 }

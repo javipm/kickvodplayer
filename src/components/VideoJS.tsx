@@ -14,6 +14,7 @@ export default function VideoJS(props: {
 }) {
   const videoRef = useRef<HTMLDivElement | null>(null)
   const playerRef = useRef<Player | null>(null)
+
   const { options, onReady, videoUuid, userIsLogged } = props
 
   const saveProgress = () => {
@@ -53,6 +54,16 @@ export default function VideoJS(props: {
       player.src(options.sources)
     }
   }, [options, videoRef])
+
+  useEffect(() => {
+    const player = playerRef.current
+
+    if (player) {
+      player.hlsQualitySelector({
+        displayCurrentQuality: true,
+      })
+    }
+  }, [playerRef])
 
   useEffect(() => {
     let intervalId: NodeJS.Timeout | null = null

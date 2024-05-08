@@ -5,14 +5,11 @@ import 'jb-videojs-hls-quality-selector'
 import 'videojs-mobile-ui/dist/videojs-mobile-ui.css'
 import 'videojs-mobile-ui'
 import 'videojs-hotkeys'
-import 'videojs-seek-buttons'
-import 'videojs-seek-buttons/dist/videojs-seek-buttons.css'
 import type PlayerType from 'video.js/dist/types/player'
 
 type Player = PlayerType & {
   hlsQualitySelector?: any
   mobileUi?: any
-  seekButtons?: any
 }
 
 const PROGRESS_INTERVAL_SECONDS = 60
@@ -77,10 +74,6 @@ export default function VideoJS(props: {
         touchControls: {
           tapTimeout: 100,
         },
-      })
-      player.seekButtons({
-        forward: 30,
-        back: 10,
       })
 
       if (progress) {

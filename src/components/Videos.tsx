@@ -24,6 +24,9 @@ export default function Videos({
     responsive: true,
     fluid: true,
     poster: poster,
+    enableSmoothSeeking: true,
+    liveui: true,
+    preload: 'auto',
     sources: [
       {
         src: uri,
@@ -33,6 +36,12 @@ export default function Videos({
       hotkeys: {
         volumeStep: 0.1,
         seekStep: 30,
+      },
+    },
+    controlBar: {
+      skipButtons: {
+        forward: 30,
+        backward: 10,
       },
     },
   }

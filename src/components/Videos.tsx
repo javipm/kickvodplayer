@@ -14,7 +14,9 @@ export default function Videos({
   const [videoUuid, setVideoUuid] = useState<string>('')
   const [poster, setPoster] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(true)
-  const [progress, setProgress] = useState<Array<any>>([])
+
+  const [allProgress, setAllProgress] = useState<Array<any>>([])
+  const [progress, setProgress] = useState<number>(0)
 
   const videoJsOptions = {
     autoplay: false,
@@ -49,7 +51,7 @@ export default function Videos({
         fetch(`/api/progress/get`)
           .then((response) => response.json())
           .then((data) => {
-            setProgress(data)
+            setAllProgress(data)
           })
       }
     }, 1000)
@@ -73,6 +75,11 @@ export default function Videos({
         setUri(source)
         setPoster(video.thumbnail.src)
         setVideoUuid(video.video.uuid)
+
+        const progress = allProgress.find(
+          (item: any) => item.videoId === video.video.uuid
+        )?.progress
+        setProgress(progress || 0)
       })
   }
 
@@ -97,6 +104,7 @@ export default function Videos({
             options={videoJsOptions}
             videoUuid={videoUuid}
             userIsLogged={userIsLogged}
+            progress={progress}
           />
         </div>
       ) : null}
@@ -106,7 +114,7 @@ export default function Videos({
 
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 '>
         {(videos as Array<Video>).map((video: any) => {
-          const progressVideo = progress.find(
+          const progressVideo = allProgress.find(
             (item: any) => item.videoId === video.video.uuid
           )?.progress
 

@@ -16,12 +16,13 @@ export default function VideoJS(props: {
   options: any
   videoUuid: string
   userIsLogged: boolean
+  progress: number
   onReady?: any
 }) {
   const videoRef = useRef<HTMLDivElement | null>(null)
   const playerRef = useRef<Player | null>(null)
 
-  const { options, onReady, videoUuid, userIsLogged } = props
+  const { options, onReady, videoUuid, userIsLogged, progress } = props
 
   const saveProgress = () => {
     if (!userIsLogged) return
@@ -75,6 +76,10 @@ export default function VideoJS(props: {
         forward: 30,
         back: 10,
       })
+
+      if (progress) {
+        player.currentTime(progress / 1000)
+      }
     }
   }, [playerRef])
 

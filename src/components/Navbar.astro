@@ -1,0 +1,45 @@
+---
+import { getSession } from 'auth-astro/server'
+
+const session = await getSession(Astro.request)
+---
+
+<nav class='bg-zinc-800 p-2'>
+  <div class='max-w-screen-lg mx-auto flex justify-between items-center'>
+    <h1 class='text-xl text-white'>Kick VOD Player</h1>
+    {
+      session && session.user ? (
+        <div class='flex items-center'>
+          <p class='text-white text-sm mr-4'>{session.user.name}</p>
+          <button
+            id='logout'
+            class='bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded text-sm'
+          >
+            Logout
+          </button>
+        </div>
+      ) : (
+        <div>
+          <button
+            id='login'
+            class='bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded text-sm'
+          >
+            Login with Twitch
+          </button>
+        </div>
+      )
+    }
+  </div>
+</nav>
+
+<script>
+  const { signIn, signOut } = await import('auth-astro/client')
+  const loginButton = document.querySelector('#login') as HTMLButtonElement
+  if (loginButton) {
+    loginButton.onclick = () => signIn('twitch')
+  }
+  const logoutButton = document.querySelector('#logout') as HTMLButtonElement
+  if (logoutButton) {
+    logoutButton.onclick = () => signOut()
+  }
+</script>

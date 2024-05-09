@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
 import videojs from 'video.js'
 import 'video.js/dist/video-js.css'
 import 'jb-videojs-hls-quality-selector'
@@ -27,26 +27,12 @@ export default function VideoJS(props: {
 
   const { options, onReady, videoUuid, userIsLogged, progress } = props
 
-  const saveProgress = () => {
-    if (!userIsLogged) return
-
-    console.log('Saving progress...')
-    const player = playerRef.current
-
-    const progress = (player?.currentTime() ?? 0) * 1000
-    fetch(`/api/progress/${videoUuid}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        progress,
-      }),
-    })
-  }
+  const onReadyCallback = useCallback(onReady, [])
 
   useEffect(() => {
-    if (!playerRef.current) {
+    const player = playerRef.current
+
+    if (!player) {
       const videoElement = document.createElement('video-js')
 
       videoElement.classList.add('vjs-big-play-centered')
@@ -54,33 +40,27 @@ export default function VideoJS(props: {
         videoRef.current.appendChild(videoElement)
       }
 
-      const player = (playerRef.current = videojs(videoElement, options, () => {
-        onReady && onReady(player)
-      }))
+      playerRef.current = videojs(videoElement, options, () => {
+        onReadyCallback && onReadyCallback(player)
+      })
     } else {
-      const player = playerRef.current
-
       player.autoplay(options.autoplay)
       player.src(options.sources)
     }
-  }, [options, videoRef])
+  }, [options, videoRef, onReadyCallback])
 
   useEffect(() => {
     const player = playerRef.current
 
     if (player) {
       player.hlsQualitySelector({ displayCurrentQuality: true })
-      player.mobileUi({
-        touchControls: {
-          tapTimeout: 100,
-        },
-      })
+      player.mobileUi()
 
       if (progress) {
         player.currentTime(progress / 1000)
       }
     }
-  }, [playerRef])
+  }, [playerRef, progress])
 
   useEffect(() => {
     let intervalId: NodeJS.Timeout | null = null
@@ -88,6 +68,23 @@ export default function VideoJS(props: {
     const player = playerRef.current
 
     if (player) {
+      const saveProgress = () => {
+        if (!userIsLogged) return
+
+        console.log('Saving progress...')
+
+        const progress = (player?.currentTime() ?? 0) * 1000
+        fetch(`/api/progress/${videoUuid}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            progress,
+          }),
+        })
+      }
+
       player.on('play', () => {
         saveProgress()
         intervalId = setInterval(() => {
@@ -96,6 +93,7 @@ export default function VideoJS(props: {
       })
 
       player.on('pause', () => {
+        saveProgress()
         if (intervalId) {
           clearInterval(intervalId)
           intervalId = null
@@ -112,7 +110,7 @@ export default function VideoJS(props: {
         playerRef.current = null
       }
     }
-  }, [playerRef])
+  }, [playerRef, userIsLogged, videoUuid])
 
   return (
     <div data-vjs-player className='h-auto w-full lg:w-2/3'>

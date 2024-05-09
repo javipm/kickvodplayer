@@ -46,40 +46,46 @@ export default function Videos({
     },
   }
 
+  const fetchVideos = async () => {
+    try {
+      const response = await fetch(
+        `https://kick.com/api/v1/channels/${streamer}`
+      )
+      if (!response.ok) throw new Error('Failed to fetch videos')
+      const data = await response.json()
+      setVideos(data.previous_livestreams)
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchProgress = async () => {
+    if (!userIsLogged) return
+    try {
+      const response = await fetch(`/api/progress/get`)
+      const data = await response.json()
+      setAllProgress(data)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   useEffect(() => {
     setVideos([])
     setUri('')
     setLoading(true)
 
     const getVideos = setTimeout(() => {
-      fetch(`https://kick.com/api/v1/channels/${streamer}`)
-        .then((response) => {
-          if (!response.ok) {
-            setLoading(false)
-          }
-          return response.json()
-        })
-        .then((data) => {
-          setVideos(data.previous_livestreams)
-          setLoading(false)
-        })
-        .catch((error) => {
-          setLoading(false)
-        })
-
-      if (userIsLogged) {
-        fetch(`/api/progress/get`)
-          .then((response) => response.json())
-          .then((data) => {
-            setAllProgress(data)
-          })
-      }
+      fetchVideos()
+      fetchProgress()
     }, 1000)
 
     return () => clearTimeout(getVideos)
   }, [streamer])
 
-  const getVideo = (id: number) => {
+  const getVideo = async (id: number) => {
     const video: Video | undefined = videos.find(
       (video: Video) => video.id === id
     )
@@ -88,31 +94,70 @@ export default function Videos({
       return
     }
 
-    fetch(`https://kick.com/api/v1/video/${video.video.uuid}`)
-      .then((response) => response.json())
-      .then((data) => {
-        const source = data.source
-        setUri(source)
-        setPoster(video.thumbnail.src)
-        setVideoUuid(video.video.uuid)
+    try {
+      const response = await fetch(
+        `https://kick.com/api/v1/video/${video.video.uuid}`
+      )
+      const data = await response.json()
+      const source = data.source
+      setUri(source)
+      setPoster(video.thumbnail.src)
+      setVideoUuid(video.video.uuid)
 
-        const progress = allProgress.find(
-          (item: any) => item.videoId === video.video.uuid
-        )?.progress
-        setProgress(progress || 0)
-      })
+      const progress = allProgress.find(
+        (item: any) => item.videoId === video.video.uuid
+      )?.progress
+      setProgress(progress || 0)
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   const secondsToHms = (d: number) => {
-    d = Number(d) / 1000
-    var h = Math.floor(d / 3600)
-    var m = Math.floor((d % 3600) / 60)
-    var s = Math.floor((d % 3600) % 60)
+    const h = Math.floor(d / 3600)
+    const m = Math.floor((d % 3600) / 60)
+    const s = Math.floor((d % 3600) % 60)
 
-    var hDisplay = h > 0 ? (h < 10 ? '0' + h : h) + ':' : '00:'
-    var mDisplay = m > 0 ? (m < 10 ? '0' + m : m) + ':' : '00:'
-    var sDisplay = s > 0 ? (s < 10 ? '0' + s : s) : '00'
+    const hDisplay = h.toString().padStart(2, '0') + ':'
+    const mDisplay = m.toString().padStart(2, '0') + ':'
+    const sDisplay = s.toString().padStart(2, '0')
+
     return hDisplay + mDisplay + sDisplay
+  }
+
+  const renderVideo = (video: any) => {
+    const progressVideo = allProgress.find(
+      (item: any) => item.videoId === video.video.uuid
+    )?.progress
+
+    const duration = video.duration
+    const progressPercentage = progressVideo
+      ? (progressVideo / duration) * 100
+      : 0
+
+    return (
+      <article key={video.id} className='cursor-pointer'>
+        <div className='relative' onClick={() => getVideo(video.id)}>
+          <div className='aspect-video overflow-hidden'>
+            <img
+              src={video.thumbnail.src}
+              alt={video.session_title}
+              className='object-cover'
+            />
+          </div>
+          <div
+            className='absolute bottom-0 left-0 h-1 w-full bg-green-500'
+            style={{ width: `${progressPercentage}%` }}
+          ></div>
+          <span className='absolute text-white bg-green-500 top-0 p-1 text-sm'>
+            {secondsToHms(video.duration)}
+          </span>
+        </div>
+        <h3 className='text-white text-center font-bold mt-2'>
+          {video.session_title}
+        </h3>
+      </article>
+    )
   }
 
   return videos && videos.length > 0 ? (
@@ -133,38 +178,7 @@ export default function Videos({
       </h2>
 
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 '>
-        {(videos as Array<Video>).map((video: any) => {
-          const progressVideo = allProgress.find(
-            (item: any) => item.videoId === video.video.uuid
-          )?.progress
-
-          const duration = video.duration
-          let progressPercentage = 0
-
-          if (progressVideo)
-            progressPercentage = (progressVideo / duration) * 100
-          return (
-            <article key={video.id} className='cursor-pointer'>
-              <div className='relative' onClick={() => getVideo(video.id)}>
-                <img
-                  src={video.thumbnail.src}
-                  alt={video.session_title}
-                  className='aspect-video object-cover'
-                />
-                <div
-                  className='absolute bottom-0 left-0 h-1 w-full bg-green-500'
-                  style={{ width: `${progressPercentage}%` }}
-                ></div>
-                <span className='absolute text-white bg-green-500 top-0 p-1 text-sm'>
-                  {secondsToHms(video.duration)}
-                </span>
-              </div>
-              <h3 className='text-white text-center font-bold mt-2'>
-                {video.session_title}
-              </h3>
-            </article>
-          )
-        })}
+        {videos.map(renderVideo)}
       </div>
     </section>
   ) : loading ? (

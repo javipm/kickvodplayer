@@ -214,3 +214,15 @@ export interface GeneratedConversions {
   fullsize: boolean
   medium: boolean
 }
+
+export interface Recent {
+  id: string
+  uuid: string
+  title: string
+  duration: string
+  thumbnail: string
+  streamer: string
+  streamerSlug: string
+  progress: string
+  source: string
+}

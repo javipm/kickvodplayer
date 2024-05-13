@@ -1,9 +1,10 @@
 import { secondsToHms } from '@/utils/functions'
 import { useEffect, useState } from 'react'
+import type { Recent } from '..'
 
 export default function InProgress() {
   const [recents, setRecents] = useState([])
-  const [videos, setVideos] = useState([])
+  const [videos, setVideos] = useState<Recent[]>([])
 
   useEffect(() => {
     try {
@@ -18,9 +19,11 @@ export default function InProgress() {
   }, [])
 
   useEffect(() => {
-    recents.map((video: any) => {
+    recents.map((video: Recent) => {
       getVideoData(video).then((data) => {
-        setVideos([...videos, data])
+        if (data) {
+          setVideos([...videos, data])
+        }
       })
     })
   }, [recents])

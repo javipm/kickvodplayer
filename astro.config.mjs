@@ -10,5 +10,7 @@ import db from '@astrojs/db'
 export default defineConfig({
   integrations: [tailwind(), react(), auth(), db()],
   output: 'server',
-  adapter: vercel(),
+  adapter: vercel({
+    webAnalytics: { enabled: true },
+  }),
 })

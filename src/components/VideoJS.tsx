@@ -6,6 +6,7 @@ import 'videojs-mobile-ui/dist/videojs-mobile-ui.css'
 import 'videojs-mobile-ui'
 import 'videojs-hotkeys'
 import type PlayerType from 'video.js/dist/types/player'
+import { saveProgress } from '@/lib/api'
 
 type Player = PlayerType & {
   hlsQualitySelector?: any
@@ -75,32 +76,24 @@ export default function VideoJS(props: {
     const player = playerRef.current
 
     if (player) {
-      const saveProgress = () => {
+      const updateProgressVideo = () => {
         if (!userIsLogged) return
 
         console.log('Saving progress...')
 
         const progress = (player?.currentTime() ?? 0) * 1000
-        fetch(`/api/progress/${videoUuid}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            progress,
-          }),
-        })
+        saveProgress(videoUuid, progress)
       }
 
       player.on('play', () => {
-        saveProgress()
+        updateProgressVideo()
         intervalId = setInterval(() => {
-          saveProgress()
+          updateProgressVideo()
         }, PROGRESS_INTERVAL_SECONDS * 1000)
       })
 
       player.on('pause', () => {
-        saveProgress()
+        updateProgressVideo()
         if (intervalId) {
           clearInterval(intervalId)
           intervalId = null

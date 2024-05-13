@@ -45,7 +45,6 @@ export const POST: APIRoute = async ({ params, request }) => {
     createdAt: NOW,
   }
 
-  console.log(data)
   try {
     await db
       .insert(VideoProgress)

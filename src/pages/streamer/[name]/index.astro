@@ -1,7 +1,7 @@
 ---
 export const prerender = false
 
-import Videos from '@/components/Videos'
+import List from '@/components/List'
 import Layout from '@/layouts/Layout.astro'
 
 import { getSession } from 'auth-astro/server'
@@ -17,11 +17,7 @@ const { name } = Astro.params
 >
   <main class='p-2 justify-center mx-auto'>
     <section class='max-w-screen-lg mx-auto'>
-      {
-        name && (
-          <Videos streamer={name} userIsLogged={userIsLogged} client:load />
-        )
-      }
+      {name && <List streamer={name} userIsLogged={userIsLogged} client:load />}
     </section>
   </main>
 </Layout>

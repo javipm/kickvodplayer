@@ -13,7 +13,6 @@ export const GET: APIRoute = async ({ request }) => {
   if (!session || session?.user?.email == null) {
     return new Response('Unauthorized', { status: 401 })
   }
-  const userId = generateUserId(session.user.email)
 
   try {
     const result = await db

@@ -10,3 +10,7 @@ export function secondsToHms(d: number) {
 
   return hDisplay + mDisplay + sDisplay
 }
+
+export function calculateProgress(progress: number, duration: number) {
+  return progress ? (progress / duration) * 100 : 0
+}

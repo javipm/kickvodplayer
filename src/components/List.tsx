@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
+import VideoElement from '@/components/Video'
 import type { Video } from '..'
 import VideoJsPlayer from './VideoJS'
-import { secondsToHms } from '@/utils/functions'
+import { getProgresses, getStreamer, geteVideo } from '@/lib/api'
 
-export default function Videos({
+export default function List({
   streamer,
   userIsLogged,
   videoId,
@@ -51,12 +52,8 @@ export default function Videos({
 
   const fetchVideos = async () => {
     try {
-      const response = await fetch(
-        `https://kick.com/api/v1/channels/${streamer}`
-      )
-      if (!response.ok) throw new Error('Failed to fetch videos')
-      const data = await response.json()
-      setVideos(data.previous_livestreams)
+      const data = await getStreamer(streamer)
+      if (data) setVideos(data.previous_livestreams)
     } catch (error) {
       console.error(error)
     } finally {
@@ -67,8 +64,7 @@ export default function Videos({
   const fetchProgress = async () => {
     if (!userIsLogged) return
     try {
-      const response = await fetch(`/api/progress/streamer`)
-      const data = await response.json()
+      const data = await getProgresses()
       setAllProgress(data)
     } catch (error) {
       console.error(error)
@@ -104,10 +100,7 @@ export default function Videos({
     }
 
     try {
-      const response = await fetch(
-        `https://kick.com/api/v1/video/${video.video.uuid}`
-      )
-      const data = await response.json()
+      const data = await geteVideo(video.video.uuid)
       const source = data.source
       setUri(source)
       setPoster(video.thumbnail.src)
@@ -120,6 +113,9 @@ export default function Videos({
         (item: any) => item.videoId === video.video.uuid
       )?.progress
       setProgress(progress || 0)
+
+      //Scroll to top
+      window.scrollTo(0, 0)
     } catch (error) {
       console.error(error)
     }
@@ -130,37 +126,16 @@ export default function Videos({
       (item: any) => item.videoId === video.video.uuid
     )?.progress
 
-    const duration = video.duration
-    const progressPercentage = progressVideo
-      ? (progressVideo / duration) * 100
-      : 0
-
     return (
-      <article
+      <VideoElement
         key={video.id}
-        data-video-id={video.id}
-        className='cursor-pointer'
-      >
-        <div className='relative' onClick={() => getVideo(video.id)}>
-          <div className='aspect-video overflow-hidden'>
-            <img
-              src={video.thumbnail.src}
-              alt={video.session_title}
-              className='object-cover'
-            />
-          </div>
-          <div
-            className='absolute bottom-0 left-0 h-1 w-full bg-green-500'
-            style={{ width: `${progressPercentage}%` }}
-          ></div>
-          <span className='absolute text-white bg-green-500 top-0 p-1 text-sm'>
-            {secondsToHms(video.duration)}
-          </span>
-        </div>
-        <h3 className='text-white text-center font-bold mt-2'>
-          {video.session_title}
-        </h3>
-      </article>
+        id={video.id}
+        thumbnail={video.thumbnail.src}
+        title={video.session_title}
+        duration={video.duration}
+        progress={progressVideo}
+        getVideo={() => getVideo(video.id)}
+      />
     )
   }
 
@@ -182,7 +157,7 @@ export default function Videos({
       </h2>
 
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 '>
-        {videos.map(renderVideo)}
+        {videos.map((video: any) => renderVideo(video))}
       </div>
     </section>
   ) : loading ? (

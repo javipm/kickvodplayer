@@ -6,7 +6,10 @@ const session = await getSession(Astro.request)
 
 <nav class='bg-zinc-800 p-2'>
   <div class='max-w-screen-lg mx-auto flex justify-between items-center'>
-    <h1 class='text-2xl text-green-500'>Kick VOD Player</h1>
+    <a href='/'
+      ><h1 class='text-2xl text-white cursor-pointer'>KICK VOD Player</h1></a
+    >
+
     {
       session && session.user ? (
         <div class='flex items-center'>

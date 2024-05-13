@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react'
 import type { Video } from '..'
 import VideoJsPlayer from './VideoJS'
+import { secondsToHms } from '@/utils/functions'
 
 export default function Videos({
   streamer,
   userIsLogged,
+  videoId,
 }: {
   streamer: string
   userIsLogged: boolean
+  videoId?: number
 }) {
   const [videos, setVideos] = useState<Video[]>([])
   const [uri, setUri] = useState<string>('')
@@ -64,7 +67,7 @@ export default function Videos({
   const fetchProgress = async () => {
     if (!userIsLogged) return
     try {
-      const response = await fetch(`/api/progress/get`)
+      const response = await fetch(`/api/progress/streamer`)
       const data = await response.json()
       setAllProgress(data)
     } catch (error) {
@@ -85,6 +88,12 @@ export default function Videos({
     return () => clearTimeout(getVideos)
   }, [streamer])
 
+  useEffect(() => {
+    if (videoId) {
+      getVideo(videoId)
+    }
+  }, [videoId, videos])
+
   const getVideo = async (id: number) => {
     const video: Video | undefined = videos.find(
       (video: Video) => video.id === id
@@ -104,6 +113,9 @@ export default function Videos({
       setPoster(video.thumbnail.src)
       setVideoUuid(video.video.uuid)
 
+      //Add uuid video to url path
+      window.history.pushState({}, '', `/streamer/${streamer}/${video.id}`)
+
       const progress = allProgress.find(
         (item: any) => item.videoId === video.video.uuid
       )?.progress
@@ -111,19 +123,6 @@ export default function Videos({
     } catch (error) {
       console.error(error)
     }
-  }
-
-  const secondsToHms = (d: number) => {
-    d = Number(d) / 1000
-    const h = Math.floor(d / 3600)
-    const m = Math.floor((d % 3600) / 60)
-    const s = Math.floor((d % 3600) % 60)
-
-    const hDisplay = h.toString().padStart(2, '0') + ':'
-    const mDisplay = m.toString().padStart(2, '0') + ':'
-    const sDisplay = s.toString().padStart(2, '0')
-
-    return hDisplay + mDisplay + sDisplay
   }
 
   const renderVideo = (video: any) => {
@@ -137,7 +136,11 @@ export default function Videos({
       : 0
 
     return (
-      <article key={video.id} className='cursor-pointer'>
+      <article
+        key={video.id}
+        data-video-id={video.id}
+        className='cursor-pointer'
+      >
         <div className='relative' onClick={() => getVideo(video.id)}>
           <div className='aspect-video overflow-hidden'>
             <img

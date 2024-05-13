@@ -6,6 +6,7 @@ const VideoProgress = {
     videoId: column.text(),
     userId: column.text(),
     progress: column.number(),
+    createdAt: column.date(),
   },
 }
 // https://astro.build/db/config

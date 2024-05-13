@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro'
-import { db, VideoProgress } from 'astro:db'
+import { db, NOW, VideoProgress } from 'astro:db'
 import { object, number, safeParse } from 'valibot'
 import { getSession } from 'auth-astro/server'
 import { createHash } from 'node:crypto'
@@ -42,6 +42,7 @@ export const POST: APIRoute = async ({ params, request }) => {
     userId,
     videoId,
     progress: progress,
+    createdAt: NOW,
   }
 
   console.log(data)

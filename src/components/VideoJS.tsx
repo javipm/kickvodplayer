@@ -54,7 +54,14 @@ export default function VideoJS(props: {
 
     if (player) {
       player.hlsQualitySelector({ displayCurrentQuality: true })
-      player.mobileUi()
+      player.mobileUi({
+        fullscreen: {
+          enterOnRotate: true,
+          exitOnRotate: true,
+          lockOnRotate: true,
+          lockToLandscapeOnEnter: true,
+        },
+      })
 
       if (progress) {
         player.currentTime(progress / 1000)
@@ -113,7 +120,7 @@ export default function VideoJS(props: {
   }, [playerRef, userIsLogged, videoUuid])
 
   return (
-    <div data-vjs-player className='h-auto w-full lg:w-2/3'>
+    <div data-vjs-player className='h-auto w-full'>
       <div ref={videoRef} />
     </div>
   )

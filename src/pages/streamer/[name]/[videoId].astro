@@ -1,0 +1,32 @@
+---
+export const prerender = false
+
+import Videos from '@/components/Videos'
+import Layout from '@/layouts/Layout.astro'
+
+import { getSession } from 'auth-astro/server'
+const session = await getSession(Astro.request)
+const userIsLogged = session !== null
+
+const { name, videoId } = Astro.params
+---
+
+<Layout
+  title=`Kick VODs Player - ${name}`
+  description=`List of VODs from ${name}`
+>
+  <main class='p-2 justify-center mx-auto'>
+    <section class='max-w-screen-lg mx-auto'>
+      {
+        name && (
+          <Videos
+            streamer={name}
+            userIsLogged={userIsLogged}
+            videoId={parseInt(videoId || '')}
+            client:load
+          />
+        )
+      }
+    </section>
+  </main>
+</Layout>

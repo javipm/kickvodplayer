@@ -1,9 +1,7 @@
 ---
+import InProgress from '@/components/InProgress'
 import Layout from '../layouts/Layout.astro'
-import Home from 'src/components/Home'
-
 import { getSession } from 'auth-astro/server'
-
 const session = await getSession(Astro.request)
 const userIsLogged = session !== null
 ---
@@ -12,7 +10,55 @@ const userIsLogged = session !== null
   title='Kick VODs Player'
   description='SA simple video player for Kick VODs'
 >
-  <main class='p-5 lg:p-10'>
-    <Home client:load userIsLogged={userIsLogged} />
+  <main class='p-5 lg:p-10 justify-center mx-auto'>
+    <section class='max-w-screen-sm mx-auto'>
+      <form
+        id='searchForm'
+        class='flex flex-row content-center place-content-center gap-2'
+      >
+        <input
+          type='text'
+          placeholder='Type Kick streamer name'
+          name='streamer'
+          class='w-full text-sm p-2 rounded border-2 border-gray-300 focus:outline-none focus:border-blue-500 text-black'
+        />
+        <button
+          class='p-2 bg-green-500 text-white font-bold rounded text-sm focus:outline-none max-w-24'
+        >
+          Search
+        </button>
+      </form>
+    </section>
+    {
+      userIsLogged && (
+        <section class='max-w-screen-lg mt-10 mx-auto'>
+          <InProgress client:load />
+        </section>
+      )
+    }
   </main>
 </Layout>
+
+<script>
+  import { checkStreamer } from 'src/utils/api'
+
+  window.addEventListener('load', () => {
+    const form = document.getElementById('searchForm')
+    if (form) {
+      form.addEventListener('submit', async function (event) {
+        event.preventDefault()
+        const input = document.querySelector(
+          'input[name="streamer"]'
+        ) as HTMLInputElement
+        const streamer = input?.value
+        const result = await checkStreamer(streamer)
+        if (!result) {
+          alert('Streamer not found')
+          return false
+        }
+
+        window.location.href = `/streamer/${streamer}`
+      })
+    }
+  })
+</script>

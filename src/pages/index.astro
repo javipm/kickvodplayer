@@ -43,23 +43,21 @@ const userIsLogged = session !== null
 <script>
   import { getKickStreamer } from '@/lib/api'
 
-  document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('searchForm')
-    if (form) {
-      form.addEventListener('submit', async function (event) {
-        event.preventDefault()
-        const input = document.querySelector(
-          'input[name="streamer"]'
-        ) as HTMLInputElement
-        const streamer = input?.value
-        const result = await getKickStreamer(streamer)
-        if (!result) {
-          alert('Streamer not found')
-          return false
-        }
+  const form = document.getElementById('searchForm')
+  if (form) {
+    form.addEventListener('submit', async function (event) {
+      event.preventDefault()
+      const input = document.querySelector(
+        'input[name="streamer"]'
+      ) as HTMLInputElement
+      const streamer = input?.value
+      const result = await getKickStreamer(streamer)
+      if (!result) {
+        alert('Streamer not found')
+        return false
+      }
 
-        window.location.href = `/streamer/${streamer}`
-      })
-    }
-  })
+      window.location.href = `/streamer/${streamer}`
+    })
+  }
 </script>

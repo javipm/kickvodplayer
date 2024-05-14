@@ -16,17 +16,15 @@ const { name, videoId } = Astro.params
   description=`List of VODs from ${name}`
 >
   <main class='justify-center mx-auto'>
-    <section class='max-w-screen-lg mx-auto'>
-      {
-        name && (
-          <List
-            streamer={name}
-            userIsLogged={userIsLogged}
-            videoId={parseInt(videoId || '')}
-            client:load
-          />
-        )
-      }
-    </section>
+    {
+      name && (
+        <List
+          streamer={name}
+          userIsLogged={userIsLogged}
+          videoId={parseInt(videoId || '')}
+          client:load
+        />
+      )
+    }
   </main>
 </Layout>

@@ -1,6 +1,8 @@
 ---
 import Navbar from 'src/components/Navbar.astro'
 import SpeedInsights from '@vercel/speed-insights/astro'
+import InfoIcon from '@/components/icons/Info'
+import CodeIcon from '@/components/icons/Code'
 
 interface Props {
   title: string
@@ -20,10 +22,23 @@ const { title, description } = Astro.props
     <meta name='generator' content={Astro.generator} />
     <title>{title}</title>
   </head>
-  <body class='bg-black'>
+  <body class='bg-black h-full min-h-screen'>
     <Navbar />
     <slot />
+    <!-- <footer class='text-white p-4 mt-auto'>
+      <div class='flex justify-end space-x-4'>
+        <a href='/about' class='text-white text-sm cursor-pointer'>
+          <InfoIcon />
+        </a>
+        <a
+          href='https://github.com/javipm/kickvodplayer'
+          target='blank'
+          class='text-white text-sm cursor-pointer'
+        >
+          <CodeIcon />
+        </a>
+      </div>
+    </footer> -->
     <SpeedInsights />
   </body>
 </html>
-<style is:global></style>

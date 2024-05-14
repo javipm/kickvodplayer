@@ -62,20 +62,25 @@ export default function InProgress() {
   return (
     videos &&
     videos.length > 0 && (
-      <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 '>
-        {videos.map((video: any) => (
-          <VideoElement
-            key={video.id}
-            id={video.id}
-            thumbnail={video.thumbnail}
-            streamer={video.streamer}
-            title={video.title}
-            duration={video.duration}
-            progress={video.progress}
-            getVideo={() => getVideo(video.streamerSlug, video.id)}
-          />
-        ))}
-      </div>
+      <section>
+        <h2 className='mb-4 text-green-500 text-2xl font-bold'>
+          Continue watching...
+        </h2>
+        <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 '>
+          {videos.map((video: any) => (
+            <VideoElement
+              key={video.id}
+              id={video.id}
+              thumbnail={video.thumbnail}
+              streamer={video.streamer}
+              title={video.title}
+              duration={video.duration}
+              progress={video.progress}
+              getVideo={() => getVideo(video.streamerSlug, video.id)}
+            />
+          ))}
+        </div>
+      </section>
     )
   )
 }

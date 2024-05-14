@@ -160,29 +160,15 @@ export default function List({
 
   return (
     <div>
-      <section>
-        {uri ? (
-          <div className='grid my-4 lg:mb-10 place-items-center'>
-            <VideoJsPlayer
-              source={uri}
-              options={videoJsOptions}
-              videoUuid={videoUuid}
-              userIsLogged={userIsLogged}
-              progress={progress}
-            />
-          </div>
-        ) : null}
-      </section>
-
       {streamerInfo && streamerInfo.name && (
-        <header className='my-4 lg:my-10 flex items-center'>
+        <header className='flex items-center mb-4'>
           <div className='relative w-full'>
             <img
-              className='w-full h-36 object-cover'
+              className='w-full h-36 md:h-64 object-cover'
               src={streamerInfo?.banner_image_url}
               alt='banner'
             />
-            <div className='absolute inset-0 flex items-center justify-between px-4 lg:px-10'>
+            <div className='max-w-screen-lg mx-auto absolute inset-0 flex items-center justify-between'>
               <div className='flex items-center'>
                 <img
                   className='w-24 h-24 rounded-full border-4 border-white mr-4'
@@ -204,28 +190,46 @@ export default function List({
         </header>
       )}
 
-      {videos && videos.length > 0 ? (
-        <section className='px-2 md:px-0'>
-          <h1 className='mb-4 text-green-500 text-2xl font-bold bg-black bg-opacity-60 backdrop-blur-sm'>
-            {streamerInfo?.name}'s latest VODs
-          </h1>
-          <div className='flex gap-4 overflow-x-scroll pb-6 hide-scrollbar md:grid md:grid-cols-2 lg:grid-cols-3'>
-            {videos.map((video) => (
-              <div className='inline-block'>
-                <article className='w-80 md:w-full'>
-                  {renderVideo(video)}
-                </article>
-              </div>
-            ))}
+      <section className='max-w-screen-lg mx-auto'>
+        {uri ? (
+          <div className='grid mb-4 lg:mb-10 place-items-center'>
+            <VideoJsPlayer
+              source={uri}
+              options={videoJsOptions}
+              videoUuid={videoUuid}
+              userIsLogged={userIsLogged}
+              progress={progress}
+            />
           </div>
-        </section>
-      ) : loading ? (
-        <div className='text-white pt-10 text-xl font-bold'>Loading...</div>
-      ) : (
-        <div className='text-white pt-10 text-xl font-bold'>
-          No VODs or streamer found
-        </div>
-      )}
+        ) : null}
+      </section>
+
+      <section className='max-w-screen-lg mx-auto px-2 md:px-0'>
+        {videos && videos.length > 0 ? (
+          <>
+            <h2 className='mb-4 text-green-500 text-2xl font-bold'>
+              {streamerInfo?.name}'s latest VODs
+            </h2>
+            <div className='flex gap-4 overflow-x-scroll pb-6 hide-scrollbar md:grid md:grid-cols-2 lg:grid-cols-3'>
+              {videos.map((video) => (
+                <div className='inline-block'>
+                  <article className='w-80 md:w-full'>
+                    {renderVideo(video)}
+                  </article>
+                </div>
+              ))}
+            </div>
+          </>
+        ) : loading ? (
+          <div className='flex justify-center items-center h-screen'>
+            <div className='animate-spin h-10 w-10 border-t-2 border-b-2 border-white rounded-full'></div>
+          </div>
+        ) : (
+          <div className='text-white pt-10 text-xl font-bold'>
+            No VODs found
+          </div>
+        )}
+      </section>
     </div>
   )
 }

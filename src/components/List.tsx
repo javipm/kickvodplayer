@@ -210,7 +210,7 @@ export default function List({
             <h2 className='mb-4 text-green-500 text-2xl font-bold'>
               {streamerInfo?.name}'s latest VODs
             </h2>
-            <div className='flex gap-4 overflow-x-scroll pb-6 hide-scrollbar md:grid md:grid-cols-2 lg:grid-cols-3'>
+            <div className='flex gap-4 overflow-x-scroll md:overflow-auto pb-6 hide-scrollbar md:grid md:grid-cols-2 lg:grid-cols-3'>
               {videos.map((video) => (
                 <div className='inline-block'>
                   <article className='w-80 md:w-full'>

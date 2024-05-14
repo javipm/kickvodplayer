@@ -151,8 +151,22 @@ export default function List({
 
   return (
     <article>
+      <section>
+        {uri ? (
+          <div className='grid mb-4 lg:mb-10 place-items-center'>
+            <VideoJsPlayer
+              source={uri}
+              options={videoJsOptions}
+              videoUuid={videoUuid}
+              userIsLogged={userIsLogged}
+              progress={progress}
+            />
+          </div>
+        ) : null}
+      </section>
+
       {streamerInfo && streamerInfo.name && (
-        <header className='my-10 flex items-center'>
+        <header className='my-4 lg:my-10 flex items-center'>
           <div className='relative w-full'>
             <img
               className='w-full h-36 object-cover'
@@ -180,20 +194,6 @@ export default function List({
           </div>
         </header>
       )}
-
-      <section>
-        {uri ? (
-          <div className='grid mb-10 place-items-center'>
-            <VideoJsPlayer
-              source={uri}
-              options={videoJsOptions}
-              videoUuid={videoUuid}
-              userIsLogged={userIsLogged}
-              progress={progress}
-            />
-          </div>
-        ) : null}
-      </section>
 
       {videos && videos.length > 0 ? (
         <section>

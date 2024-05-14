@@ -15,7 +15,7 @@ const { name } = Astro.params
   title=`Kick VODs Player - ${name}`
   description=`List of VODs from ${name}`
 >
-  <main class='p-2 justify-center mx-auto'>
+  <main class='justify-center mx-auto'>
     <section class='max-w-screen-lg mx-auto'>
       {name && <List streamer={name} userIsLogged={userIsLogged} client:load />}
     </section>

@@ -137,23 +137,32 @@ export default function List({
     )?.progress
 
     return (
-      <VideoElement
-        key={video.id}
-        id={video.id}
-        thumbnail={video.thumbnail.src}
-        title={video.session_title}
-        duration={video.duration}
-        progress={progressVideo}
-        getVideo={() => getVideo(video.id)}
-      />
+      <div className='relative'>
+        {videoUuid == video.video.uuid && (
+          <div className='absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10'>
+            <span className='text-white text-lg font-bold animate-blink'>
+              Playing now...
+            </span>
+          </div>
+        )}
+        <VideoElement
+          key={video.id}
+          id={video.id}
+          thumbnail={video.thumbnail.src}
+          title={video.session_title}
+          duration={video.duration}
+          progress={progressVideo}
+          getVideo={() => getVideo(video.id)}
+        />
+      </div>
     )
   }
 
   return (
-    <article>
+    <div>
       <section>
         {uri ? (
-          <div className='grid mb-4 lg:mb-10 place-items-center'>
+          <div className='grid my-4 lg:mb-10 place-items-center'>
             <VideoJsPlayer
               source={uri}
               options={videoJsOptions}
@@ -173,16 +182,16 @@ export default function List({
               src={streamerInfo?.banner_image_url}
               alt='banner'
             />
-            <div className='absolute inset-0 flex items-center justify-between px-10'>
+            <div className='absolute inset-0 flex items-center justify-between px-4 lg:px-10'>
               <div className='flex items-center'>
                 <img
                   className='w-24 h-24 rounded-full border-4 border-white mr-4'
                   src={streamerInfo?.profile_image_url}
                   alt='profile'
                 />
-                <h1 className='p-2 rounded text-green-500 text-2xl font-bold bg-black bg-opacity-60 backdrop-blur-sm'>
-                  List of VODs from {streamerInfo?.name}
-                </h1>
+                <span className='p-2 rounded text-white text-2xl font-bold bg-black bg-opacity-60 backdrop-blur-sm'>
+                  {streamerInfo?.name}
+                </span>
               </div>
               {/* <button
                 className='py-2 px-4 rounded text-white font-bold bg-green-500 hover:bg-green-600'
@@ -196,9 +205,18 @@ export default function List({
       )}
 
       {videos && videos.length > 0 ? (
-        <section>
-          <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 '>
-            {videos.map((video: any) => renderVideo(video))}
+        <section className='px-2 md:px-0'>
+          <h1 className='mb-4 text-green-500 text-2xl font-bold bg-black bg-opacity-60 backdrop-blur-sm'>
+            {streamerInfo?.name}'s latest VODs
+          </h1>
+          <div className='flex gap-4 overflow-x-scroll pb-6 hide-scrollbar md:grid md:grid-cols-2 lg:grid-cols-3'>
+            {videos.map((video) => (
+              <div className='inline-block'>
+                <article className='w-80 md:w-full'>
+                  {renderVideo(video)}
+                </article>
+              </div>
+            ))}
           </div>
         </section>
       ) : loading ? (
@@ -208,6 +226,17 @@ export default function List({
           No VODs or streamer found
         </div>
       )}
-    </article>
+    </div>
   )
 }
+
+;<style jsx>{`
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+`}</style>

@@ -28,7 +28,7 @@ export default function Video({
           className='absolute bottom-0 left-0 h-1 w-full bg-green-500'
           style={{ width: `${progressPercentage}%` }}
         ></div>
-        <span className='absolute text-white bg-green-500 top-0 p-1 text-sm'>
+        <span className='absolute text-white bg-black bg-opacity-60 backdrop-blur-sm top-1 left-1 p-1 text-xs'>
           {secondsToHms(duration)}
         </span>
       </div>

@@ -151,7 +151,7 @@ export default function List({
 
   return (
     <article>
-      {streamerInfo && (
+      {streamerInfo && streamerInfo.name && (
         <header className='my-10 flex items-center'>
           <div className='relative w-full'>
             <img

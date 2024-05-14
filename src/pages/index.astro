@@ -43,7 +43,7 @@ const userIsLogged = session !== null
 <script>
   import { getKickStreamer } from '@/lib/api'
 
-  window.addEventListener('load', () => {
+  document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('searchForm')
     if (form) {
       form.addEventListener('submit', async function (event) {

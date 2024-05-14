@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import VideoElement from '@/components/Video'
-import type { Video, StreamerHeader } from '..'
+import type { Video, StreamerInfo } from '..'
 import VideoJsPlayer from './Player'
-import { getProgresses, getStreamer, geteVideo } from '@/lib/api'
+import { getProgresses, getKickStreamer, getKickVideo } from '@/lib/api'
 
 export default function List({
   streamer,
@@ -18,7 +18,7 @@ export default function List({
   const [videoUuid, setVideoUuid] = useState<string>('')
   const [poster, setPoster] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(true)
-  const [streamerInfo, setStreamerInfo] = useState<StreamerHeader>()
+  const [streamerInfo, setStreamerInfo] = useState<StreamerInfo>()
 
   const [allProgress, setAllProgress] = useState<Array<any>>([])
   const [progress, setProgress] = useState<number>(0)
@@ -53,7 +53,7 @@ export default function List({
 
   const fetchVideos = async () => {
     try {
-      const data = await getStreamer(streamer)
+      const data = await getKickStreamer(streamer)
       if (data) {
         setStreamerInfo({
           id: data.id,
@@ -110,7 +110,7 @@ export default function List({
     }
 
     try {
-      const data = await geteVideo(video.video.uuid)
+      const data = await getKickVideo(video.video.uuid)
       const source = data.source
       setUri(source)
       setPoster(video.thumbnail.src)

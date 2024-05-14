@@ -227,7 +227,7 @@ export interface Recent {
   source: string
 }
 
-export interface StreamerHeader {
+export interface StreamerInfo {
   id: number
   name: string
   profile_image_url: string

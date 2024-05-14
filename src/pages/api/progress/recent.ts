@@ -1,11 +1,6 @@
 import type { APIRoute } from 'astro'
 import { db, VideoProgress, desc } from 'astro:db'
 import { getSession } from 'auth-astro/server'
-import { createHash } from 'node:crypto'
-
-const generateUserId = (str: string) => {
-  return createHash('sha256').update(str).digest('hex')
-}
 
 export const GET: APIRoute = async ({ request }) => {
   const session = await getSession(request)

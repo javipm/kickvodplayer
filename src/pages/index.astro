@@ -40,7 +40,7 @@ const userIsLogged = session !== null
 </Layout>
 
 <script>
-  import { getStreamer } from '@/lib/api'
+  import { getKickStreamer } from '@/lib/api'
 
   window.addEventListener('load', () => {
     const form = document.getElementById('searchForm')
@@ -51,7 +51,7 @@ const userIsLogged = session !== null
           'input[name="streamer"]'
         ) as HTMLInputElement
         const streamer = input?.value
-        const result = await getStreamer(streamer)
+        const result = await getKickStreamer(streamer)
         if (!result) {
           alert('Streamer not found')
           return false

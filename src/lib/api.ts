@@ -1,4 +1,4 @@
-export async function getStreamer(streamer: string) {
+export async function getKickStreamer(streamer: string) {
   if (!streamer) return false
   try {
     const response = await fetch(`https://kick.com/api/v1/channels/${streamer}`)
@@ -9,7 +9,7 @@ export async function getStreamer(streamer: string) {
   }
 }
 
-export async function geteVideo(videoId: string) {
+export async function getKickVideo(videoId: string) {
   try {
     const response = await fetch(`https://kick.com/api/v1/video/${videoId}`)
     return await response.json()

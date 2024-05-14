@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import VideoElement from '@/components/Video'
-import type { Video } from '..'
-import VideoJsPlayer from './VideoJS'
+import type { Video, StreamerHeader } from '..'
+import VideoJsPlayer from './Player'
 import { getProgresses, getStreamer, geteVideo } from '@/lib/api'
 
 export default function List({
@@ -18,6 +18,7 @@ export default function List({
   const [videoUuid, setVideoUuid] = useState<string>('')
   const [poster, setPoster] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(true)
+  const [streamerInfo, setStreamerInfo] = useState<StreamerHeader>()
 
   const [allProgress, setAllProgress] = useState<Array<any>>([])
   const [progress, setProgress] = useState<number>(0)
@@ -53,7 +54,16 @@ export default function List({
   const fetchVideos = async () => {
     try {
       const data = await getStreamer(streamer)
-      if (data) setVideos(data.previous_livestreams)
+      if (data) {
+        setStreamerInfo({
+          id: data.id,
+          name: data.user?.username,
+          profile_image_url: data.user?.profile_pic,
+          banner_image_url: data.banner_image?.url,
+        })
+
+        setVideos(data.previous_livestreams)
+      }
     } catch (error) {
       console.error(error)
     } finally {
@@ -139,30 +149,65 @@ export default function List({
     )
   }
 
-  return videos && videos.length > 0 ? (
-    <section>
-      {uri ? (
-        <div className='grid pt-10 lg:pt-10 place-items-center'>
-          <VideoJsPlayer
-            source={uri}
-            options={videoJsOptions}
-            videoUuid={videoUuid}
-            userIsLogged={userIsLogged}
-            progress={progress}
-          />
-        </div>
-      ) : null}
-      <h2 className='text-green-500 text-center text-3xl font-bold my-10'>
-        List of VODs from {streamer}
-      </h2>
+  return (
+    <article>
+      {streamerInfo && (
+        <header className='my-10 flex items-center'>
+          <div className='relative w-full'>
+            <img
+              className='w-full h-36 object-cover'
+              src={streamerInfo?.banner_image_url}
+              alt='banner'
+            />
+            <div className='absolute inset-0 flex items-center justify-between px-10'>
+              <div className='flex items-center'>
+                <img
+                  className='w-24 h-24 rounded-full border-4 border-white mr-4'
+                  src={streamerInfo?.profile_image_url}
+                  alt='profile'
+                />
+                <h1 className='p-2 rounded text-green-500 text-2xl font-bold bg-black bg-opacity-60 backdrop-blur-sm'>
+                  List of VODs from {streamerInfo?.name}
+                </h1>
+              </div>
+              {/* <button
+                className='py-2 px-4 rounded text-white font-bold bg-green-500 hover:bg-green-600'
+                onClick={() => console.log('hola')}
+              >
+                ⭐️ Follow
+              </button> */}
+            </div>
+          </div>
+        </header>
+      )}
 
-      <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 '>
-        {videos.map((video: any) => renderVideo(video))}
-      </div>
-    </section>
-  ) : loading ? (
-    <div className='text-white pt-10 text-xl font-bold'>Loading...</div>
-  ) : (
-    <div className='text-white pt-10 text-xl font-bold'>No videos found</div>
+      <section>
+        {uri ? (
+          <div className='grid mb-10 place-items-center'>
+            <VideoJsPlayer
+              source={uri}
+              options={videoJsOptions}
+              videoUuid={videoUuid}
+              userIsLogged={userIsLogged}
+              progress={progress}
+            />
+          </div>
+        ) : null}
+      </section>
+
+      {videos && videos.length > 0 ? (
+        <section>
+          <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 '>
+            {videos.map((video: any) => renderVideo(video))}
+          </div>
+        </section>
+      ) : loading ? (
+        <div className='text-white pt-10 text-xl font-bold'>Loading...</div>
+      ) : (
+        <div className='text-white pt-10 text-xl font-bold'>
+          No VODs or streamer found
+        </div>
+      )}
+    </article>
   )
 }

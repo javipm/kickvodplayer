@@ -226,3 +226,10 @@ export interface Recent {
   progress: string
   source: string
 }
+
+export interface StreamerHeader {
+  id: number
+  name: string
+  profile_image_url: string
+  banner_image_url: string
+}

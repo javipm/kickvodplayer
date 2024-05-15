@@ -19,13 +19,18 @@ export default function InProgress() {
   }, [])
 
   useEffect(() => {
-    recents.map((video: Recent) => {
-      getVideoData(video).then((data) => {
+    const fetchVideos = async () => {
+      const newVideos = []
+      for (let video of recents) {
+        const data = await getVideoData(video)
         if (data) {
-          setVideos([...videos, data])
+          newVideos.push(data)
         }
-      })
-    })
+      }
+      setVideos(newVideos)
+    }
+
+    fetchVideos()
   }, [recents])
 
   const getVideoData = async (video: any) => {
@@ -34,7 +39,7 @@ export default function InProgress() {
         `https://kick.com/api/v1/video/${video.videoId}`
       )
       const data = await response.json()
-      const { source, livestream, live_stream_id } = data
+      const { source, livestream, live_stream_id, created_at } = data
       const { session_title, duration, thumbnail, channel } = livestream
       const { user, slug } = channel
       const { username } = user
@@ -49,6 +54,7 @@ export default function InProgress() {
         streamerSlug: slug,
         progress: video.progress,
         source,
+        date: new Date(created_at).toLocaleString(),
       }
     } catch (error) {
       console.error(error)
@@ -63,18 +69,19 @@ export default function InProgress() {
     videos &&
     videos.length > 0 && (
       <section>
-        <h2 className='mb-4 text-green-500 text-2xl font-bold'>
+        <h3 className='mb-4 text-green-500 text-2xl font-bold'>
           Continue watching...
-        </h2>
+        </h3>
         <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 '>
           {videos.map((video: any) => (
             <VideoElement
               key={video.id}
               id={video.id}
-              thumbnail={video.thumbnail}
               streamer={video.streamer}
               title={video.title}
+              date={video.date}
               duration={video.duration}
+              thumbnail={video.thumbnail}
               progress={video.progress}
               getVideo={() => getVideo(video.streamerSlug, video.id)}
             />

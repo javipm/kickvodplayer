@@ -10,7 +10,7 @@ export default {
         },
       },
       animation: {
-        blink: 'blink 2s linear infinite',
+        blink: 'blink 3s linear infinite',
       },
     },
   },

@@ -8,10 +8,22 @@ const userIsLogged = session !== null
 
 <Layout
   title='Kick VODs Player'
-  description='SA simple video player for Kick VODs'
+  description='Watch your favorite Kick streamers VODs with Kick VODs Player.'
 >
-  <main class='pt-5 lg:pt-10 justify-center mx-auto'>
-    <section class='max-w-screen-sm mx-auto'>
+  <main class='pt-5 justify-center mx-auto'>
+    <section class='max-w-screen-lg mx-auto text-white p-6'>
+      <h2 class='mb-4 text-green-500 text-4xl font-bold text-center'>
+        Welcome to Kick VODs player
+      </h2>
+      <p class='mb-4 text-white text-sm font-bold text-center'>
+        Enter the name of the streamer you want to watch and press the search
+        button to see their VODs.
+        <br />
+        If you want to mark your favorite streamers and save your playback progress,
+        you can log in with Twitch.
+      </p>
+    </section>
+    <section class='max-w-screen-sm mx-auto p-6'>
       <form
         id='searchForm'
         class='flex flex-row content-center place-content-center gap-2'
@@ -21,6 +33,7 @@ const userIsLogged = session !== null
           placeholder='Type Kick streamer name'
           name='streamer'
           class='w-full text-sm p-2 rounded border-2 border-gray-300 focus:outline-none focus:border-blue-500 text-black'
+          required
         />
         <button
           type='submit'
@@ -32,7 +45,7 @@ const userIsLogged = session !== null
     </section>
     {
       userIsLogged && (
-        <section class='max-w-screen-lg mt-10 mx-auto'>
+        <section class='max-w-screen-lg mt-10 p-6 md:p-0 mx-auto'>
           <InProgress client:load />
         </section>
       )
@@ -50,7 +63,7 @@ const userIsLogged = session !== null
       const input = document.querySelector(
         'input[name="streamer"]'
       ) as HTMLInputElement
-      const streamer = input?.value
+      const streamer = input?.value.toLowerCase()
       const result = await getKickStreamer(streamer)
       if (!result) {
         alert('Streamer not found')

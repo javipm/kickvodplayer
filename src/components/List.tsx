@@ -3,6 +3,7 @@ import VideoElement from '@/components/Video'
 import type { Video, StreamerInfo } from '..'
 import VideoJsPlayer from './Player'
 import { getProgresses, getKickStreamer, getKickVideo } from '@/lib/api'
+import PlayIcon from '@/components/icons/Play'
 
 export default function List({
   streamer,
@@ -141,15 +142,16 @@ export default function List({
         {videoUuid == video.video.uuid && (
           <div className='absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10'>
             <span className='text-white text-lg font-bold animate-blink'>
-              Playing now...
+              <PlayIcon className='text-7xl opacity-80 -mt-4' />
             </span>
           </div>
         )}
         <VideoElement
           key={video.id}
           id={video.id}
-          thumbnail={video.thumbnail.src}
+          date={new Date(video.created_at).toLocaleString()}
           title={video.session_title}
+          thumbnail={video.thumbnail.src}
           duration={video.duration}
           progress={progressVideo}
           getVideo={() => getVideo(video.id)}

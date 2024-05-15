@@ -225,6 +225,7 @@ export interface Recent {
   streamerSlug: string
   progress: string
   source: string
+  date: string
 }
 
 export interface StreamerInfo {

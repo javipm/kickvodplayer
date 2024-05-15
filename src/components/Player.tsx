@@ -83,8 +83,6 @@ export default function VideoJS(props: {
   }, [source, videoRef, onReadyCallback])
 
   useEffect(() => {
-    console.log('useEffect2')
-
     const player = playerRef.current
 
     if (player) {
@@ -105,8 +103,6 @@ export default function VideoJS(props: {
   }, [playerRef, progress])
 
   useEffect(() => {
-    console.log('useEffect3')
-
     let intervalId: NodeJS.Timeout | null = null
 
     const player = playerRef.current
@@ -114,8 +110,6 @@ export default function VideoJS(props: {
     if (player) {
       const updateProgressVideo = () => {
         if (!userIsLogged) return
-
-        console.log('Saving progress...')
 
         const progress = (player?.currentTime() ?? 0) * 1000
         saveProgress(videoUuid, progress)

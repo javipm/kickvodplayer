@@ -32,9 +32,11 @@ export async function saveProgress(videoId: string, progress: number) {
   }
 }
 
-export async function getProgresses() {
+export async function getProgresses(limit?: number) {
   try {
-    const response = await fetch(`/api/progress/all`)
+    const response = await fetch(
+      `/api/progress/all${limit ? `?limit=${limit}` : ''}`
+    )
     return await response.json()
   } catch (error) {
     console.error(error)

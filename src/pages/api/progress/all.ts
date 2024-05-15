@@ -10,12 +10,21 @@ export const GET: APIRoute = async ({ request }) => {
     return new Response('Unauthorized', { status: 401 })
   }
   const userId = await generateUserId(session.user.email)
+  const params = new URL(request.url).searchParams
+
+  const limit = params.get('limit') || null
 
   try {
-    const result = await db
+    let query = db
       .select()
       .from(VideoProgress)
       .where(eq(VideoProgress.userId, userId))
+
+    if (limit) {
+      query.limit(parseInt(limit))
+    }
+
+    const result = await query
     return new Response(JSON.stringify(result), {
       headers: {
         'Content-Type': 'application/json',

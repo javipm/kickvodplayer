@@ -1,21 +1,23 @@
 import VideoElement from '@/components/Video'
 import { useEffect, useState } from 'react'
 import type { Recent } from '..'
+import { getKickVideo, getProgresses } from '@/lib/api'
 
 export default function InProgress() {
   const [recents, setRecents] = useState([])
   const [videos, setVideos] = useState<Recent[]>([])
 
-  useEffect(() => {
+  const fetchRecents = async () => {
     try {
-      fetch(`/api/progress/recent`)
-        .then((res) => res.json())
-        .then((data) => {
-          setRecents(data)
-        })
+      const response = await getProgresses(6)
+      setRecents(response)
     } catch (error) {
       console.error(error)
     }
+  }
+
+  useEffect(() => {
+    fetchRecents()
   }, [])
 
   useEffect(() => {
@@ -35,10 +37,7 @@ export default function InProgress() {
 
   const getVideoData = async (video: any) => {
     try {
-      const response = await fetch(
-        `https://kick.com/api/v1/video/${video.videoId}`
-      )
-      const data = await response.json()
+      const data = await getKickVideo(video.videoId)
       const { source, livestream, live_stream_id, created_at } = data
       const { session_title, duration, thumbnail, channel } = livestream
       const { user, slug } = channel

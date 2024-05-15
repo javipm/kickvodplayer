@@ -1,6 +1,6 @@
 import { generateUserId } from '@/lib/utils'
 import type { APIRoute } from 'astro'
-import { db, VideoProgress, eq } from 'astro:db'
+import { db, VideoProgress, eq, desc } from 'astro:db'
 import { getSession } from 'auth-astro/server'
 
 export const GET: APIRoute = async ({ request }) => {
@@ -19,6 +19,7 @@ export const GET: APIRoute = async ({ request }) => {
       .select()
       .from(VideoProgress)
       .where(eq(VideoProgress.userId, userId))
+      .orderBy(desc(VideoProgress.createdAt))
 
     if (limit) {
       query.limit(parseInt(limit))

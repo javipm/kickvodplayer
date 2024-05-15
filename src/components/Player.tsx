@@ -16,8 +16,8 @@ type Player = PlayerType & {
 const PROGRESS_INTERVAL_SECONDS = 60
 
 export default function VideoJS(props: {
-  source: any
-  options: any
+  source: string
+  poster: string
   videoUuid: string
   userIsLogged: boolean
   progress: number
@@ -26,11 +26,43 @@ export default function VideoJS(props: {
   const videoRef = useRef<HTMLDivElement | null>(null)
   const playerRef = useRef<Player | null>(null)
 
-  const { options, onReady, videoUuid, userIsLogged, progress } = props
+  const { onReady, videoUuid, poster, userIsLogged, progress, source } = props
 
   const onReadyCallback = useCallback(onReady, [])
 
+  const defaultOptions = {
+    autoplay: true,
+    controls: true,
+    responsive: true,
+    fluid: true,
+    enableSmoothSeeking: true,
+    liveui: true,
+    preload: 'auto',
+    plugins: {
+      hotkeys: {
+        volumeStep: 0.1,
+        seekStep: 30,
+      },
+    },
+    controlBar: {
+      skipButtons: {
+        forward: 10,
+        backward: 10,
+      },
+    },
+  }
+
   useEffect(() => {
+    const options = {
+      ...defaultOptions,
+      sources: [
+        {
+          src: source,
+        },
+      ],
+      poster: poster,
+    }
+
     const player = playerRef.current
 
     if (!player) {
@@ -48,9 +80,11 @@ export default function VideoJS(props: {
       player.autoplay(options.autoplay)
       player.src(options.sources)
     }
-  }, [options, videoRef, onReadyCallback])
+  }, [source, videoRef, onReadyCallback])
 
   useEffect(() => {
+    console.log('useEffect2')
+
     const player = playerRef.current
 
     if (player) {
@@ -71,6 +105,8 @@ export default function VideoJS(props: {
   }, [playerRef, progress])
 
   useEffect(() => {
+    console.log('useEffect3')
+
     let intervalId: NodeJS.Timeout | null = null
 
     const player = playerRef.current

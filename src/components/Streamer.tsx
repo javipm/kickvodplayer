@@ -2,10 +2,18 @@ import { useEffect, useState } from 'react'
 import VideoElement from '@/components/Video'
 import type { Video, StreamerInfo } from '..'
 import VideoJsPlayer from './Player'
-import { getProgresses, getKickStreamer, getKickVideo } from '@/lib/api'
+import {
+  getProgresses,
+  getKickStreamer,
+  getKickVideo,
+  getIsFollowing,
+  setUnfollow,
+  setFollow,
+} from '@/lib/api'
 import PlayIcon from '@/components/icons/Play'
+import Heart from './icons/Heart'
 
-export default function List({
+export default function Streamer({
   streamer,
   userIsLogged,
   videoId,
@@ -20,37 +28,10 @@ export default function List({
   const [poster, setPoster] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(true)
   const [streamerInfo, setStreamerInfo] = useState<StreamerInfo>()
+  const [isFollowing, setIsFollowing] = useState<boolean>(false)
 
   const [allProgress, setAllProgress] = useState<Array<any>>([])
   const [progress, setProgress] = useState<number>(0)
-
-  const videoJsOptions = {
-    autoplay: false,
-    controls: true,
-    responsive: true,
-    fluid: true,
-    poster: poster,
-    enableSmoothSeeking: true,
-    liveui: true,
-    preload: 'auto',
-    sources: [
-      {
-        src: uri,
-      },
-    ],
-    plugins: {
-      hotkeys: {
-        volumeStep: 0.1,
-        seekStep: 30,
-      },
-    },
-    controlBar: {
-      skipButtons: {
-        forward: 10,
-        backward: 10,
-      },
-    },
-  }
 
   const fetchVideos = async () => {
     try {
@@ -87,12 +68,14 @@ export default function List({
     setUri('')
     setLoading(true)
 
-    const getVideos = setTimeout(() => {
-      fetchVideos()
-      fetchProgress()
-    }, 1000)
+    fetchVideos()
+    fetchProgress()
 
-    return () => clearTimeout(getVideos)
+    if (userIsLogged) {
+      getIsFollowing(streamer).then((data) => {
+        setIsFollowing(data.isFollowing)
+      })
+    }
   }, [streamer])
 
   useEffect(() => {
@@ -138,7 +121,7 @@ export default function List({
     )?.progress
 
     return (
-      <div className='relative'>
+      <div className='relative' key={video.id}>
         {videoUuid == video.video.uuid && (
           <div className='absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10'>
             <span className='text-white text-lg font-bold animate-blink'>
@@ -160,8 +143,18 @@ export default function List({
     )
   }
 
+  const toggleFollow = async () => {
+    if (isFollowing) {
+      const response = await setUnfollow(streamer)
+      if (response) setIsFollowing(false)
+    } else {
+      const response = await setFollow(streamer)
+      if (response) setIsFollowing(true)
+    }
+  }
+
   return (
-    <div>
+    <div key={streamer}>
       {streamerInfo && streamerInfo.name && (
         <header className='flex items-center mb-4'>
           <div className='relative w-full'>
@@ -181,12 +174,24 @@ export default function List({
                   {streamerInfo?.name}
                 </span>
               </div>
-              {/* <button
-                className='py-2 px-4 rounded text-white font-bold bg-green-500 hover:bg-green-600'
-                onClick={() => console.log('hola')}
-              >
-                ⭐️ Follow
-              </button> */}
+              {userIsLogged && (
+                <button
+                  className='flex items-center justify-center gap-2 py-2 px-4 rounded text-white font-bold bg-green-500 hover:bg-green-700'
+                  onClick={toggleFollow}
+                >
+                  {isFollowing ? (
+                    <>
+                      <Heart className='fill-current' />
+                      <span>Unfollow</span>
+                    </>
+                  ) : (
+                    <>
+                      <Heart />
+                      <span>Follow</span>
+                    </>
+                  )}
+                </button>
+              )}
             </div>
           </div>
         </header>
@@ -197,7 +202,7 @@ export default function List({
           <div className='grid mb-4 lg:mb-10 place-items-center'>
             <VideoJsPlayer
               source={uri}
-              options={videoJsOptions}
+              poster={poster}
               videoUuid={videoUuid}
               userIsLogged={userIsLogged}
               progress={progress}
@@ -214,7 +219,7 @@ export default function List({
             </h2>
             <div className='flex gap-4 overflow-x-scroll md:overflow-auto pb-6 hide-scrollbar md:grid md:grid-cols-2 lg:grid-cols-3'>
               {videos.map((video) => (
-                <div className='inline-block'>
+                <div key={video.id} className='inline-block'>
                   <article className='w-80 md:w-full'>
                     {renderVideo(video)}
                   </article>

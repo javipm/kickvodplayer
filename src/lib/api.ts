@@ -40,3 +40,38 @@ export async function getProgresses() {
     console.error(error)
   }
 }
+
+export async function getIsFollowing(streamer: string) {
+  try {
+    const response = await fetch(`/api/follows/${streamer}`)
+    return await response.json()
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+export async function setFollow(streamer: string) {
+  try {
+    const response = await fetch(`/api/follows/set/${streamer}`)
+    if (response.status === 200) {
+      return true
+    }
+    return false
+  } catch (error) {
+    console.error(error)
+    return false
+  }
+}
+
+export async function setUnfollow(streamer: string) {
+  try {
+    const response = await fetch(`/api/follows/unset/${streamer}`)
+    if (response.status === 200) {
+      return true
+    }
+    return false
+  } catch (error) {
+    console.error(error)
+    return false
+  }
+}

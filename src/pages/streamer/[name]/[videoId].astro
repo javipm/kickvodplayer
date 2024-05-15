@@ -1,7 +1,7 @@
 ---
 export const prerender = false
 
-import List from '@/components/List'
+import Streamer from '@/components/Streamer'
 import Layout from '@/layouts/Layout.astro'
 
 import { getSession } from 'auth-astro/server'
@@ -15,10 +15,10 @@ const { name, videoId } = Astro.params
   title=`Kick VODs Player - ${name}`
   description=`List of VODs from ${name}`
 >
-  <main class='justify-center mx-auto'>
+  <section class='justify-center mx-auto'>
     {
       name && (
-        <List
+        <Streamer
           streamer={name}
           userIsLogged={userIsLogged}
           videoId={parseInt(videoId || '')}
@@ -26,5 +26,5 @@ const { name, videoId } = Astro.params
         />
       )
     }
-  </main>
+  </section>
 </Layout>

@@ -14,3 +14,11 @@ export function secondsToHms(d: number) {
 export function calculateProgress(progress: number, duration: number) {
   return progress ? (progress / duration) * 100 : 0
 }
+
+export async function generateUserId(str: string) {
+  const msgUint8 = new TextEncoder().encode(str)
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('')
+  return hashHex
+}

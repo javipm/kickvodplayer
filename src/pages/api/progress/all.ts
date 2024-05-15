@@ -1,11 +1,7 @@
+import { generateUserId } from '@/lib/utils'
 import type { APIRoute } from 'astro'
 import { db, VideoProgress, eq } from 'astro:db'
 import { getSession } from 'auth-astro/server'
-import { createHash } from 'node:crypto'
-
-const generateUserId = (str: string) => {
-  return createHash('sha256').update(str).digest('hex')
-}
 
 export const GET: APIRoute = async ({ request }) => {
   const session = await getSession(request)
@@ -13,7 +9,7 @@ export const GET: APIRoute = async ({ request }) => {
   if (!session || session?.user?.email == null) {
     return new Response('Unauthorized', { status: 401 })
   }
-  const userId = generateUserId(session.user.email)
+  const userId = await generateUserId(session.user.email)
 
   try {
     const result = await db

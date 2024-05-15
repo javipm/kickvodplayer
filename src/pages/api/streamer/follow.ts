@@ -2,11 +2,15 @@ import type { APIRoute } from 'astro'
 import { db, NOW, VideoProgress } from 'astro:db'
 import { object, number, safeParse } from 'valibot'
 import { getSession } from 'auth-astro/server'
-import { generateUserId } from '@/lib/utils'
+import { createHash } from 'node:crypto'
 
 const VideoProgressSchema = object({
   progress: number(),
 })
+
+const generateUserId = (str: string) => {
+  return createHash('sha256').update(str).digest('hex')
+}
 
 export const POST: APIRoute = async ({ params, request }) => {
   const session = await getSession(request)
@@ -15,7 +19,7 @@ export const POST: APIRoute = async ({ params, request }) => {
     return new Response('Unauthorized', { status: 401 })
   }
 
-  const userId = await generateUserId(session.user.email)
+  const userId = generateUserId(session.user.email)
   const { videoId } = params
   if (!videoId) {
     return new Response('Missing videoId', { status: 400 })

@@ -1,5 +1,6 @@
+import { generateUserId } from '@/lib/utils'
 import type { APIRoute } from 'astro'
-import { db, VideoProgress, desc } from 'astro:db'
+import { db, VideoProgress, desc, eq } from 'astro:db'
 import { getSession } from 'auth-astro/server'
 
 export const GET: APIRoute = async ({ request }) => {
@@ -9,10 +10,13 @@ export const GET: APIRoute = async ({ request }) => {
     return new Response('Unauthorized', { status: 401 })
   }
 
+  const userId = await generateUserId(session.user.email)
+
   try {
     const result = await db
       .select()
       .from(VideoProgress)
+      .where(eq(VideoProgress.userId, userId))
       .orderBy(desc(VideoProgress.createdAt))
       .limit(6)
     return new Response(JSON.stringify(result), {

@@ -2,6 +2,7 @@
 import InProgress from '@/components/InProgress'
 import Layout from '../layouts/Layout.astro'
 import { getSession } from 'auth-astro/server'
+import Following from '@/components/Following'
 const session = await getSession(Astro.request)
 const userIsLogged = session !== null
 ---
@@ -10,12 +11,12 @@ const userIsLogged = session !== null
   title='Kick VODs Player'
   description='Watch your favorite Kick streamers VODs with Kick VODs Player.'
 >
-  <main class='pt-5 justify-center mx-auto'>
+  <main class='pt-2 justify-center mx-auto'>
     <section class='max-w-screen-lg mx-auto text-white p-6'>
       <h2 class='mb-4 text-green-500 text-4xl font-bold text-center'>
         Welcome to Kick VODs player
       </h2>
-      <p class='mb-4 text-white text-sm font-bold text-center'>
+      <p class='mb-2 text-white text-sm font-bold text-center'>
         Enter the name of the streamer you want to watch and press the search
         button to see their VODs.
         <br />
@@ -23,7 +24,7 @@ const userIsLogged = session !== null
         you can log in with Twitch.
       </p>
     </section>
-    <section class='max-w-screen-sm mx-auto p-6'>
+    <section class='max-w-screen-sm mx-auto px-6'>
       <form
         id='searchForm'
         class='flex flex-row content-center place-content-center gap-2'
@@ -45,7 +46,8 @@ const userIsLogged = session !== null
     </section>
     {
       userIsLogged && (
-        <section class='max-w-screen-lg mt-10 p-6 md:p-0 mx-auto'>
+        <section class='max-w-screen-lg mt-6 px-6 py-4 md:p-0 mx-auto'>
+          <Following client:load />
           <InProgress client:load />
         </section>
       )

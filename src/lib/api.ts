@@ -9,6 +9,17 @@ export async function getKickStreamer(streamer: string) {
   }
 }
 
+export async function getKickUser(user: string) {
+  if (!user) return false
+  try {
+    const response = await fetch(`https://kick.com/api/v1/users/${user}`)
+    if (!response.ok) return false
+    return await response.json()
+  } catch (error) {
+    return false
+  }
+}
+
 export async function getKickVideo(videoId: string) {
   try {
     const response = await fetch(`https://kick.com/api/v1/video/${videoId}`)
@@ -37,6 +48,15 @@ export async function getProgresses(limit?: number) {
     const response = await fetch(
       `/api/progress/all${limit ? `?limit=${limit}` : ''}`
     )
+    return await response.json()
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+export async function getFollows() {
+  try {
+    const response = await fetch(`/api/follows/all`)
     return await response.json()
   } catch (error) {
     console.error(error)

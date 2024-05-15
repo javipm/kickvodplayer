@@ -16,22 +16,24 @@ export default function InProgress() {
     }
   }
 
+  const fetchVideos = async () => {
+    try {
+      const promises = recents.map((video) => getVideoData(video))
+      const newVideos = await Promise.all(promises)
+      const filteredVideos = newVideos.filter(
+        (video) => video !== undefined
+      ) as Recent[]
+      setVideos(filteredVideos)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   useEffect(() => {
     fetchRecents()
   }, [])
 
   useEffect(() => {
-    const fetchVideos = async () => {
-      const newVideos = []
-      for (let video of recents) {
-        const data = await getVideoData(video)
-        if (data) {
-          newVideos.push(data)
-        }
-      }
-      setVideos(newVideos)
-    }
-
     fetchVideos()
   }, [recents])
 

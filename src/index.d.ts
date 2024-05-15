@@ -234,3 +234,16 @@ export interface StreamerInfo {
   profile_image_url: string
   banner_image_url: string
 }
+
+export interface UserKick {
+  id: number
+  username: string
+  bio: string
+  twitter: string
+  facebook: string
+  instagram: string
+  youtube: string
+  discord: string
+  tiktok: string
+  profilepic: string
+}

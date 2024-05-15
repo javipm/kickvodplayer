@@ -30,3 +30,27 @@ const { title, description } = Astro.props
     <SpeedInsights />
   </body>
 </html>
+
+<style is:global>
+  /* Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: theme(colors.green.500) theme(colors.black);
+  }
+
+  /* Chrome, Edge, and Safari */
+  *::-webkit-scrollbar {
+    width: 15px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: theme(colors.black);
+    border-radius: 5px;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: theme(colors.green.500);
+    border-radius: 14px;
+    border: 3px solid theme(colors.black);
+  }
+</style>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import VideoElement from '@/components/Video'
-import type { Video, StreamerInfo } from '..'
+import type { Livestream, StreamerInfo, VideoProgress } from '..'
 import VideoJsPlayer from './Player'
 import {
   getProgresses,
@@ -22,7 +22,7 @@ export default function Streamer({
   userIsLogged: boolean
   videoId?: number
 }) {
-  const [videos, setVideos] = useState<Video[]>([])
+  const [videos, setVideos] = useState<Livestream[]>([])
   const [uri, setUri] = useState<string>('')
   const [videoUuid, setVideoUuid] = useState<string>('')
   const [poster, setPoster] = useState<string>('')
@@ -30,12 +30,13 @@ export default function Streamer({
   const [streamerInfo, setStreamerInfo] = useState<StreamerInfo>()
   const [isFollowing, setIsFollowing] = useState<boolean>(false)
 
-  const [allProgress, setAllProgress] = useState<Array<any>>([])
+  const [allProgress, setAllProgress] = useState<Array<VideoProgress>>([])
   const [progress, setProgress] = useState<number>(0)
 
   const fetchVideos = async () => {
     try {
       const data = await getKickStreamer(streamer)
+
       if (data) {
         setStreamerInfo({
           id: data.id,
@@ -57,6 +58,7 @@ export default function Streamer({
     if (!userIsLogged) return
     try {
       const data = await getProgresses()
+      if (!data) return
       setAllProgress(data)
     } catch (error) {
       console.error(error)
@@ -73,7 +75,7 @@ export default function Streamer({
 
     if (userIsLogged) {
       getIsFollowing(streamer).then((data) => {
-        setIsFollowing(data.isFollowing)
+        setIsFollowing(data)
       })
     }
   }, [streamer])
@@ -85,9 +87,7 @@ export default function Streamer({
   }, [videoId, videos])
 
   const getVideo = async (id: number) => {
-    const video: Video | undefined = videos.find(
-      (video: Video) => video.id === id
-    )
+    const video = videos.find((video) => video.id === id)
 
     if (!video) {
       return
@@ -95,7 +95,9 @@ export default function Streamer({
 
     try {
       const data = await getKickVideo(video.video.uuid)
+      if (!data) return
       const source = data.source
+      if (!source) return
       setUri(source)
       setPoster(video.thumbnail.src)
       setVideoUuid(video.video.uuid)
@@ -136,7 +138,7 @@ export default function Streamer({
           title={video.session_title}
           thumbnail={video.thumbnail.src}
           duration={video.duration}
-          progress={progressVideo}
+          progress={progressVideo ?? 0}
           getVideo={() => getVideo(video.id)}
         />
       </div>

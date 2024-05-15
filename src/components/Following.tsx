@@ -1,19 +1,21 @@
 import { getFollows, getKickUser } from '@/lib/api'
 import { useEffect, useRef, useState } from 'react'
-import type { UserKick } from '..'
+import type { User } from '..'
 
 export default function Following() {
   const listRef = useRef(null)
 
-  const [streamers, setStreamers] = useState<UserKick[]>([])
+  const [streamers, setStreamers] = useState<User[]>([])
 
   const fetchFollows = async () => {
     try {
       const follows = await getFollows()
+      if (!follows) return
       const promises = follows.map((follow: any) =>
         getKickUser(follow.streamer)
       )
-      const newStreamers = await Promise.all(promises)
+      const newStreamers = (await Promise.all(promises)) as User[]
+      if (!newStreamers) return
       setStreamers(newStreamers.filter(Boolean))
     } catch (error) {
       console.error(error)

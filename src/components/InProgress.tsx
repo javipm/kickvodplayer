@@ -1,15 +1,16 @@
 import VideoElement from '@/components/Video'
 import { useEffect, useState } from 'react'
-import type { Recent } from '..'
+import type { VideoProgress, Recent } from '..'
 import { getKickVideo, getProgresses } from '@/lib/api'
 
 export default function InProgress() {
-  const [recents, setRecents] = useState([])
+  const [recents, setRecents] = useState<VideoProgress[]>([])
   const [videos, setVideos] = useState<Recent[]>([])
 
   const fetchRecents = async () => {
     try {
       const response = await getProgresses(6)
+      if (!response) return
       setRecents(response)
     } catch (error) {
       console.error(error)
@@ -22,7 +23,7 @@ export default function InProgress() {
       const newVideos = await Promise.all(promises)
       const filteredVideos = newVideos.filter(
         (video) => video !== undefined
-      ) as Recent[]
+      ) as unknown as Recent[]
       setVideos(filteredVideos)
     } catch (error) {
       console.error(error)
@@ -40,9 +41,10 @@ export default function InProgress() {
   const getVideoData = async (video: any) => {
     try {
       const data = await getKickVideo(video.videoId)
+      if (!data) return
       const { source, livestream, live_stream_id, created_at } = data
-      const { session_title, duration, thumbnail, channel } = livestream
-      const { user, slug } = channel
+      const { session_title, duration, thumbnail, channel } = livestream!
+      const { user, slug } = channel!
       const { username } = user
 
       return {

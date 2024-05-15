@@ -1,4 +1,4 @@
-export interface Profile {
+export interface Streamer {
   id: number
   user_id: number
   slug: string
@@ -11,7 +11,7 @@ export interface Profile {
   subscriber_badges: any[]
   banner_image: BannerImage
   recent_categories: RecentCategory[]
-  livestream: any
+  livestream: Livestream
   role: any
   muted: boolean
   follower_badges: any[]
@@ -21,7 +21,7 @@ export interface Profile {
   chatroom: Chatroom
   ascending_links: AscendingLink[]
   plan: Plan
-  previous_livestreams: PreviousLivestream[]
+  previous_livestreams: Livestream[]
   verified: Verified
   media: Medum[]
 }
@@ -111,10 +111,11 @@ export interface Plan {
   updated_at: string
 }
 
-export interface PreviousLivestream {
+export interface Livestream {
   id: number
   slug: string
   channel_id: number
+  channel?: Channel
   created_at: string
   session_title: string
   is_live: boolean
@@ -131,6 +132,21 @@ export interface PreviousLivestream {
   tags: any[]
   categories: Category2[]
   video: Video
+}
+
+export interface Channel {
+  id: number
+  user_id: number
+  slug: string
+  is_banned: boolean
+  playback_url: string
+  name_updated_at: any
+  vod_enabled: boolean
+  subscription_enabled: boolean
+  followersCount: number
+  user: User
+  can_host: boolean
+  verified: Verified
 }
 
 export interface Thumbnail {
@@ -164,19 +180,20 @@ export interface Category3 {
 }
 
 export interface Video {
-  video: any
-  thumbnail: any
   id: number
   live_stream_id: number
-  slug: any
-  thumb: any
-  s3: any
-  trading_platform_id: any
+  slug: string
+  thumb: string
+  s3: string
+  trading_platform_id: number
   created_at: string
   updated_at: string
   uuid: string
   views: number
-  deleted_at: any
+  source?: string
+  created_at?: string
+  livestream?: Livestream
+  deleted_at: string
 }
 
 export interface Verified {
@@ -223,7 +240,7 @@ export interface Recent {
   thumbnail: string
   streamer: string
   streamerSlug: string
-  progress: string
+  progress: number
   source: string
   date: string
 }
@@ -235,15 +252,17 @@ export interface StreamerInfo {
   banner_image_url: string
 }
 
-export interface UserKick {
+export interface VideoProgress {
+  id: string
+  userId: string
+  videoId: string
+  progress: number
+  createdAt: string
+}
+
+export interface Follow {
   id: number
-  username: string
-  bio: string
-  twitter: string
-  facebook: string
-  instagram: string
-  youtube: string
-  discord: string
-  tiktok: string
-  profilepic: string
+  user: string
+  streamer: string
+  createdAt: string
 }

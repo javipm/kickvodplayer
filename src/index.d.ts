@@ -72,6 +72,7 @@ export interface User {
   tiktok: string
   facebook: string
   profile_pic: string
+  profilepic: string
 }
 
 export interface Chatroom {
@@ -233,10 +234,10 @@ export interface GeneratedConversions {
 }
 
 export interface Recent {
-  id: string
+  id: number
   uuid: string
   title: string
-  duration: string
+  duration: number
   thumbnail: string
   streamer: string
   streamerSlug: string

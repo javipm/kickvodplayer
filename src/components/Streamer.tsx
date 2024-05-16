@@ -33,19 +33,26 @@ export default function Streamer({
   const [allProgress, setAllProgress] = useState<Array<VideoProgress>>([])
   const [progress, setProgress] = useState<number>(0)
 
-  const fetchVideos = async () => {
+  const fetchData = async () => {
     try {
-      const data = await getKickStreamer(streamer)
+      const [streamerData, progressData] = await Promise.allSettled([
+        getKickStreamer(streamer),
+        userIsLogged ? getProgresses() : Promise.resolve(null),
+      ])
 
-      if (data) {
+      if (streamerData.status === 'fulfilled' && streamerData.value) {
         setStreamerInfo({
-          id: data.id,
-          name: data.user?.username,
-          profile_image_url: data.user?.profile_pic,
-          banner_image_url: data.banner_image?.url,
+          id: streamerData.value.id,
+          name: streamerData.value.user?.username,
+          profile_image_url: streamerData.value.user?.profile_pic,
+          banner_image_url: streamerData.value.banner_image?.url,
         })
 
-        setVideos(data.previous_livestreams)
+        setVideos(streamerData.value.previous_livestreams)
+      }
+
+      if (progressData.status === 'fulfilled' && progressData.value) {
+        setAllProgress(progressData.value)
       }
     } catch (error) {
       console.error(error)
@@ -54,24 +61,12 @@ export default function Streamer({
     }
   }
 
-  const fetchProgress = async () => {
-    if (!userIsLogged) return
-    try {
-      const data = await getProgresses()
-      if (!data) return
-      setAllProgress(data)
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
   useEffect(() => {
     setVideos([])
     setUri('')
     setLoading(true)
 
-    fetchVideos()
-    fetchProgress()
+    fetchData()
 
     if (userIsLogged) {
       getIsFollowing(streamer).then((data) => {
@@ -106,7 +101,7 @@ export default function Streamer({
       window.history.pushState({}, '', `/streamer/${streamer}/${video.id}`)
 
       const progress = allProgress.find(
-        (item: any) => item.videoId === video.video.uuid
+        (item) => item.videoId === video.video.uuid
       )?.progress
       setProgress(progress || 0)
 
@@ -117,9 +112,9 @@ export default function Streamer({
     }
   }
 
-  const renderVideo = (video: any) => {
+  const renderVideo = (video: Livestream) => {
     const progressVideo = allProgress.find(
-      (item: any) => item.videoId === video.video.uuid
+      (item) => item.videoId === video.video.uuid
     )?.progress
 
     return (

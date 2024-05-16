@@ -11,9 +11,7 @@ export default function Following() {
     try {
       const follows = await getFollows()
       if (!follows) return
-      const promises = follows.map((follow: any) =>
-        getKickUser(follow.streamer)
-      )
+      const promises = follows.map((follow) => getKickUser(follow.streamer))
       const newStreamers = (await Promise.all(promises)) as User[]
       if (!newStreamers) return
       setStreamers(newStreamers.filter(Boolean))
@@ -35,7 +33,7 @@ export default function Following() {
           ref={listRef}
           className='flex overflow-x-scroll space-x-3 whitespace-nowrap mb-4 pb-3'
         >
-          {streamers.map((streamer: any) => (
+          {streamers.map((streamer) => (
             <li
               key={streamer.id}
               className='inline-block min-w-max cursor-pointer'

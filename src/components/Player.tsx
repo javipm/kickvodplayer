@@ -15,6 +15,28 @@ type Player = PlayerType & {
 
 const PROGRESS_INTERVAL_SECONDS = 60
 
+const defaultOptions = {
+  autoplay: true,
+  controls: true,
+  responsive: true,
+  fluid: true,
+  enableSmoothSeeking: true,
+  liveui: true,
+  preload: 'auto',
+  plugins: {
+    hotkeys: {
+      volumeStep: 0.1,
+      seekStep: 30,
+    },
+  },
+  controlBar: {
+    skipButtons: {
+      forward: 10,
+      backward: 10,
+    },
+  },
+}
+
 export default function VideoJS(props: {
   source: string
   poster: string
@@ -30,29 +52,7 @@ export default function VideoJS(props: {
 
   const onReadyCallback = useCallback(onReady, [])
 
-  const defaultOptions = {
-    autoplay: true,
-    controls: true,
-    responsive: true,
-    fluid: true,
-    enableSmoothSeeking: true,
-    liveui: true,
-    preload: 'auto',
-    plugins: {
-      hotkeys: {
-        volumeStep: 0.1,
-        seekStep: 30,
-      },
-    },
-    controlBar: {
-      skipButtons: {
-        forward: 10,
-        backward: 10,
-      },
-    },
-  }
-
-  useEffect(() => {
+  const initPlayer = (source: string, poster: string) => {
     const options = {
       ...defaultOptions,
       sources: [
@@ -80,7 +80,11 @@ export default function VideoJS(props: {
       player.autoplay(options.autoplay)
       player.src(options.sources)
     }
-  }, [source, videoRef, onReadyCallback])
+  }
+
+  useEffect(() => {
+    initPlayer(source, poster)
+  }, [source, poster, onReadyCallback])
 
   useEffect(() => {
     const player = playerRef.current

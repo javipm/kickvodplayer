@@ -4,41 +4,32 @@ import type { VideoProgress, Recent } from '..'
 import { getKickVideo, getProgresses } from '@/lib/api'
 
 export default function InProgress() {
-  const [recents, setRecents] = useState<VideoProgress[]>([])
   const [videos, setVideos] = useState<Recent[]>([])
 
-  const fetchRecents = async () => {
-    try {
-      const response = await getProgresses(6)
-      if (!response) return
-      setRecents(response)
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  const fetchVideos = async () => {
-    try {
-      const promises = recents.map((video) => getVideoData(video))
-      const newVideos = await Promise.all(promises)
-      const filteredVideos = newVideos.filter(
-        (video) => video !== undefined
-      ) as unknown as Recent[]
-      setVideos(filteredVideos)
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
   useEffect(() => {
-    fetchRecents()
+    const fetchRecentsAndVideos = async () => {
+      try {
+        const response = await getProgresses(6)
+        if (!response) return
+
+        const promises = response.map((video) => getVideoData(video))
+        const results = await Promise.allSettled(promises)
+        const newVideos = results
+          .filter((result) => result.status === 'fulfilled')
+          .map(
+            (result) =>
+              (result as unknown as PromiseFulfilledResult<Recent>).value
+          )
+        setVideos(newVideos)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    fetchRecentsAndVideos()
   }, [])
 
-  useEffect(() => {
-    fetchVideos()
-  }, [recents])
-
-  const getVideoData = async (video: any) => {
+  const getVideoData = async (video: VideoProgress) => {
     try {
       const data = await getKickVideo(video.videoId)
       if (!data) return
@@ -64,7 +55,7 @@ export default function InProgress() {
     }
   }
 
-  const getVideo = (streamer: string, videoId: string) => {
+  const getVideo = (streamer: string, videoId: number) => {
     return (window.location.href = `/streamer/${streamer}/${videoId}`)
   }
 
@@ -76,7 +67,7 @@ export default function InProgress() {
           Continue watching...
         </h3>
         <div className='grid grid-cols-1 lg:grid-cols-3 gap-4 '>
-          {videos.map((video: any) => (
+          {videos.map((video) => (
             <VideoElement
               key={video.id}
               id={video.id}

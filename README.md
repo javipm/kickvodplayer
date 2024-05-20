@@ -3,7 +3,7 @@
 <h2>This project is created for educational purposes only. Kick is the owner of all videos and content. This project is non-profit and is not responsible for the use that may be made of it.</h2>
 </div>
 
-![kick-vod-player](![Alt text](/screenshot.png?raw=true "Kick VODs Player Screenshot"))
+[kick-vod-player](![Alt text](/screenshot.png?raw=true "Kick VODs Player Screenshot"))
 
 ## 🚀 Project Description
 

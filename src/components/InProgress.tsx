@@ -15,7 +15,10 @@ export default function InProgress() {
         const promises = response.map((video) => getVideoData(video))
         const results = await Promise.allSettled(promises)
         const newVideos = results
-          .filter((result) => result.status === 'fulfilled')
+          .filter(
+            (result) =>
+              result.status === 'fulfilled' && result.value !== undefined
+          )
           .map(
             (result) =>
               (result as unknown as PromiseFulfilledResult<Recent>).value

@@ -29,12 +29,6 @@ const defaultOptions = {
       seekStep: 30,
     },
   },
-  controlBar: {
-    skipButtons: {
-      forward: 10,
-      backward: 10,
-    },
-  },
 }
 
 export default function VideoJS(props: {

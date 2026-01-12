@@ -21,16 +21,13 @@ export const POST: APIRoute = async ({ params, request }) => {
     return new Response('Missing videoId', { status: 400 })
   }
 
-  const { success, output } = safeParse(
-    VideoProgressSchema,
-    await request.json()
-  )
+  const result = safeParse(VideoProgressSchema, await request.json())
 
-  if (!success) {
+  if (!result.success) {
     return new Response('Bad request', { status: 400 })
   }
 
-  const { progress } = output
+  const { progress } = result.output
 
   const newId = `${userId}-${videoId}`
   const data = {

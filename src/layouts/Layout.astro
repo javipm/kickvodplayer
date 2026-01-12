@@ -2,6 +2,7 @@
 import Navbar from 'src/components/Navbar.astro'
 import SpeedInsights from '@vercel/speed-insights/astro'
 import Footer from '@/components/Footer.astro'
+import '../styles/global.css'
 
 interface Props {
   title: string
@@ -35,7 +36,7 @@ const { title, description } = Astro.props
   /* Firefox */
   * {
     scrollbar-width: thin;
-    scrollbar-color: theme(colors.green.500) theme(colors.black);
+    scrollbar-color: var(--color-green-500) var(--color-black);
   }
 
   /* Chrome, Edge, and Safari */
@@ -44,13 +45,13 @@ const { title, description } = Astro.props
   }
 
   *::-webkit-scrollbar-track {
-    background: theme(colors.black);
+    background: var(--color-black);
     border-radius: 5px;
   }
 
   *::-webkit-scrollbar-thumb {
-    background-color: theme(colors.green.500);
+    background-color: var(--color-green-500);
     border-radius: 14px;
-    border: 3px solid theme(colors.black);
+    border: 3px solid var(--color-black);
   }
 </style>

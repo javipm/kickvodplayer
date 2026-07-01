@@ -30,7 +30,7 @@ export default function Video({
         onClick={getVideo}
         aria-label={`Play ${title}`}
         aria-current={isActive ? 'true' : undefined}
-        className='relative block w-full overflow-hidden rounded-md border border-line/70 bg-ink-raised text-left transition hover:border-white/30'
+        className='relative block w-full cursor-pointer overflow-hidden rounded-md border border-line/70 bg-ink-raised text-left transition hover:border-white/30'
       >
         <div className='relative aspect-video overflow-hidden bg-ink'>
           <img
@@ -56,10 +56,17 @@ export default function Video({
           </span>
 
           {isActive && (
-            <span className='pointer-events-none absolute right-2 top-2 flex items-center gap-1.5 rounded-full bg-signal/15 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-signal'>
-              <span className='h-1.5 w-1.5 animate-pulse rounded-full bg-signal' />
-              Playing
-            </span>
+            <div
+              aria-hidden='true'
+              className='pointer-events-none absolute inset-0 flex items-center justify-center bg-ink/60'
+            >
+              <span className='flex h-12 w-12 items-center justify-center rounded-full bg-signal/20 ring-1 ring-signal/60'>
+                <span className='h-3 w-3 animate-pulse rounded-full bg-signal' />
+              </span>
+              <span className='absolute right-2 top-2 flex items-center gap-1.5 rounded-full bg-ink/80 px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-signal backdrop-blur-sm'>
+                Playing
+              </span>
+            </div>
           )}
 
           {progressPercentage > 2 && (

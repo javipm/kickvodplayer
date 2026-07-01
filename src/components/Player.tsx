@@ -1,34 +1,42 @@
-import { useEffect, useRef, useCallback } from 'react'
-import videojs from 'video.js'
-import 'video.js/dist/video-js.css'
-import 'jb-videojs-hls-quality-selector'
-import 'videojs-mobile-ui/dist/videojs-mobile-ui.css'
-import 'videojs-mobile-ui'
-import 'videojs-hotkeys'
-import type PlayerType from 'video.js/dist/types/player'
+import { useEffect, useRef } from 'react'
+import { createPlayer, videoFeatures } from '@videojs/react'
+import { VideoSkin } from '@videojs/react/video'
+import { HlsJsVideo } from '@videojs/react/media/hlsjs-video'
+import '@videojs/react/video/skin.css'
 import { saveProgress } from '@/lib/api'
-
-type Player = PlayerType & {
-  hlsQualitySelector?: any
-  mobileUi?: any
-}
 
 const PROGRESS_INTERVAL_SECONDS = 60
 
-const defaultOptions = {
-  autoplay: true,
-  controls: true,
-  responsive: true,
-  fluid: true,
-  enableSmoothSeeking: true,
-  liveui: true,
-  preload: 'auto',
-  plugins: {
-    hotkeys: {
-      volumeStep: 0.1,
-      seekStep: 30,
-    },
-  },
+const Player = createPlayer({ features: videoFeatures })
+
+function ProgressTracker(props: {
+  videoRef: React.RefObject<HTMLVideoElement | null>
+  userIsLogged: boolean
+  videoUuid: string
+}) {
+  const { videoRef, userIsLogged, videoUuid } = props
+  const paused = Player.usePlayer((state) => state.paused)
+
+  useEffect(() => {
+    if (!userIsLogged) return
+    const video = videoRef.current
+    if (!video) return
+
+    const updateProgressVideo = () => {
+      saveProgress(videoUuid, video.currentTime * 1000)
+    }
+
+    updateProgressVideo()
+    if (paused) return
+
+    const intervalId = setInterval(
+      updateProgressVideo,
+      PROGRESS_INTERVAL_SECONDS * 1000
+    )
+    return () => clearInterval(intervalId)
+  }, [paused, userIsLogged, videoUuid, videoRef])
+
+  return null
 }
 
 export default function VideoJS(props: {
@@ -37,112 +45,31 @@ export default function VideoJS(props: {
   videoUuid: string
   userIsLogged: boolean
   progress: number
-  onReady?: any
 }) {
-  const videoRef = useRef<HTMLDivElement | null>(null)
-  const playerRef = useRef<Player | null>(null)
-
-  const { onReady, videoUuid, poster, userIsLogged, progress, source } = props
-
-  const onReadyCallback = useCallback(onReady, [])
-
-  const initPlayer = (source: string, poster: string) => {
-    const options = {
-      ...defaultOptions,
-      sources: [
-        {
-          src: source,
-        },
-      ],
-      poster: poster,
-    }
-
-    const player = playerRef.current
-
-    if (!player) {
-      const videoElement = document.createElement('video-js')
-
-      videoElement.classList.add('vjs-big-play-centered')
-      if (videoRef.current) {
-        videoRef.current.appendChild(videoElement)
-      }
-
-      playerRef.current = videojs(videoElement, options, () => {
-        onReadyCallback && onReadyCallback(player)
-      })
-    } else {
-      player.autoplay(options.autoplay)
-      player.src(options.sources)
-    }
-  }
+  const { videoUuid, poster, userIsLogged, progress, source } = props
+  const videoRef = useRef<HTMLVideoElement | null>(null)
 
   useEffect(() => {
-    initPlayer(source, poster)
-  }, [source, poster, onReadyCallback])
+    const video = videoRef.current
+    if (!video || !progress) return
 
-  useEffect(() => {
-    const player = playerRef.current
-
-    if (player) {
-      player.hlsQualitySelector({ displayCurrentQuality: true })
-      player.mobileUi({
-        fullscreen: {
-          enterOnRotate: true,
-          exitOnRotate: true,
-          lockOnRotate: true,
-          lockToLandscapeOnEnter: true,
-        },
-      })
-
-      if (progress) {
-        player.currentTime(progress / 1000)
-      }
+    const setInitialTime = () => {
+      video.currentTime = progress / 1000
     }
-  }, [playerRef, progress])
-
-  useEffect(() => {
-    let intervalId: NodeJS.Timeout | null = null
-
-    const player = playerRef.current
-
-    if (player) {
-      const updateProgressVideo = () => {
-        if (!userIsLogged) return
-
-        const progress = (player?.currentTime() ?? 0) * 1000
-        saveProgress(videoUuid, progress)
-      }
-
-      player.on('play', () => {
-        updateProgressVideo()
-        intervalId = setInterval(() => {
-          updateProgressVideo()
-        }, PROGRESS_INTERVAL_SECONDS * 1000)
-      })
-
-      player.on('pause', () => {
-        updateProgressVideo()
-        if (intervalId) {
-          clearInterval(intervalId)
-          intervalId = null
-        }
-      })
-    }
-
-    return () => {
-      if (intervalId) {
-        clearInterval(intervalId)
-      }
-      if (player && !player.isDisposed()) {
-        player.dispose()
-        playerRef.current = null
-      }
-    }
-  }, [playerRef, userIsLogged, videoUuid])
+    video.addEventListener('loadedmetadata', setInitialTime, { once: true })
+    return () => video.removeEventListener('loadedmetadata', setInitialTime)
+  }, [source, progress])
 
   return (
-    <div data-vjs-player className='h-auto w-full'>
-      <div ref={videoRef} />
-    </div>
+    <Player.Provider>
+      <VideoSkin poster={poster} className='w-full aspect-video'>
+        <HlsJsVideo ref={videoRef} src={source} autoPlay />
+      </VideoSkin>
+      <ProgressTracker
+        videoRef={videoRef}
+        userIsLogged={userIsLogged}
+        videoUuid={videoUuid}
+      />
+    </Player.Provider>
   )
 }

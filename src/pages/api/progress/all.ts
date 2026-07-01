@@ -1,32 +1,32 @@
-import { generateUserId } from '@/lib/utils'
 import type { APIRoute } from 'astro'
-import { db, VideoProgress, eq, desc } from 'astro:db'
-import { getSession } from 'auth-astro/server'
+import { getUser, createSupabaseServerClient } from '@/lib/supabase'
 
-export const GET: APIRoute = async ({ request }) => {
-  const session = await getSession(request)
+export const GET: APIRoute = async ({ request, cookies }) => {
+  const user = await getUser(request, cookies)
 
-  if (!session || session?.user?.email == null) {
+  if (!user) {
     return new Response('Unauthorized', { status: 401 })
   }
-  const userId = await generateUserId(session.user.email)
-  const params = new URL(request.url).searchParams
 
+  const params = new URL(request.url).searchParams
   const limit = params.get('limit') || null
 
+  const supabase = createSupabaseServerClient(request, cookies)
+
   try {
-    let query = db
-      .select()
-      .from(VideoProgress)
-      .where(eq(VideoProgress.userId, userId))
-      .orderBy(desc(VideoProgress.createdAt))
+    let query = supabase
+      .from('video_progress')
+      .select('videoId:video_id, progress, createdAt:created_at')
+      .order('created_at', { ascending: false })
 
     if (limit) {
-      query.limit(parseInt(limit))
+      query = query.limit(parseInt(limit))
     }
 
-    const result = await query
-    return new Response(JSON.stringify(result), {
+    const { data, error } = await query
+    if (error) throw error
+
+    return new Response(JSON.stringify(data), {
       headers: {
         'Content-Type': 'application/json',
       },

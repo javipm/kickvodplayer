@@ -1,21 +1,18 @@
 import type { APIRoute } from 'astro'
-import { db, NOW, VideoProgress } from 'astro:db'
 import { object, number, safeParse } from 'valibot'
-import { getSession } from 'auth-astro/server'
-import { generateUserId } from '@/lib/utils'
+import { getUser, createSupabaseServerClient } from '@/lib/supabase'
 
 const VideoProgressSchema = object({
   progress: number(),
 })
 
-export const POST: APIRoute = async ({ params, request }) => {
-  const session = await getSession(request)
+export const POST: APIRoute = async ({ params, request, cookies }) => {
+  const user = await getUser(request, cookies)
 
-  if (!session || session?.user?.email == null) {
+  if (!user) {
     return new Response('Unauthorized', { status: 401 })
   }
 
-  const userId = await generateUserId(session.user.email)
   const { videoId } = params
   if (!videoId) {
     return new Response('Missing videoId', { status: 400 })
@@ -29,25 +26,16 @@ export const POST: APIRoute = async ({ params, request }) => {
 
   const { progress } = result.output
 
-  const newId = `${userId}-${videoId}`
-  const data = {
-    id: newId,
-    userId,
-    videoId,
-    progress: progress,
-    createdAt: NOW,
-  }
+  const supabase = createSupabaseServerClient(request, cookies)
 
   try {
-    await db
-      .insert(VideoProgress)
-      .values(data)
-      .onConflictDoUpdate({
-        target: VideoProgress.id,
-        set: {
-          progress: data.progress,
-        },
-      })
+    await supabase
+      .from('video_progress')
+      .upsert(
+        { user_id: user.id, video_id: videoId, progress },
+        { onConflict: 'user_id,video_id' }
+      )
+      .throwOnError()
     return new Response('OK', { status: 200 })
   } catch (error) {
     console.error(error)

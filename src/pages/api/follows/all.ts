@@ -1,24 +1,24 @@
-import { generateUserId } from '@/lib/utils'
 import type { APIRoute } from 'astro'
-import { db, Follow, eq, desc } from 'astro:db'
-import { getSession } from 'auth-astro/server'
+import { getUser, createSupabaseServerClient } from '@/lib/supabase'
 
-export const GET: APIRoute = async ({ request }) => {
-  const session = await getSession(request)
+export const GET: APIRoute = async ({ request, cookies }) => {
+  const user = await getUser(request, cookies)
 
-  if (!session || session?.user?.email == null) {
+  if (!user) {
     return new Response('Unauthorized', { status: 401 })
   }
-  const userId = await generateUserId(session.user.email)
+
+  const supabase = createSupabaseServerClient(request, cookies)
 
   try {
-    const result = await db
+    const { data, error } = await supabase
+      .from('follow')
       .select()
-      .from(Follow)
-      .where(eq(Follow.userId, userId))
-      .orderBy(desc(Follow.createdAt))
+      .order('created_at', { ascending: false })
 
-    return new Response(JSON.stringify([...result]), {
+    if (error) throw error
+
+    return new Response(JSON.stringify(data), {
       headers: {
         'Content-Type': 'application/json',
       },

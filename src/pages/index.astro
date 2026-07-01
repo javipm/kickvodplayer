@@ -1,10 +1,10 @@
 ---
 import InProgress from '@/components/InProgress'
 import Layout from '../layouts/Layout.astro'
-import { getSession } from 'auth-astro/server'
+import { getUser } from '@/lib/supabase'
 import Following from '@/components/Following'
-const session = await getSession(Astro.request)
-const userIsLogged = session !== null
+const user = await getUser(Astro.request, Astro.cookies)
+const userIsLogged = user !== null
 ---
 
 <Layout

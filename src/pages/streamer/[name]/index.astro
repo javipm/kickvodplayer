@@ -4,9 +4,9 @@ export const prerender = false
 import Streamer from '@/components/Streamer'
 import Layout from '@/layouts/Layout.astro'
 
-import { getSession } from 'auth-astro/server'
-const session = await getSession(Astro.request)
-const userIsLogged = session !== null
+import { getUser } from '@/lib/supabase'
+const user = await getUser(Astro.request, Astro.cookies)
+const userIsLogged = user !== null
 
 const { name } = Astro.params
 ---

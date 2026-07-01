@@ -1,7 +1,7 @@
 ---
-import { getSession } from 'auth-astro/server'
+import { getUser } from '@/lib/supabase'
 
-const session = await getSession(Astro.request)
+const user = await getUser(Astro.request, Astro.cookies)
 ---
 
 <nav class='bg-zinc-800 p-2'>
@@ -12,10 +12,14 @@ const session = await getSession(Astro.request)
 
     <div class='flex items-center'>
       {
-        session && session.user ? (
+        user ? (
           <>
             <span class='text-white text-sm mr-4'>|</span>
-            <p class='text-white text-sm mr-4'>{session.user.name}</p>
+            <p class='text-white text-sm mr-4'>
+              {user.user_metadata?.name ??
+                user.user_metadata?.preferred_username ??
+                user.email}
+            </p>
             <button
               id='logout'
               class='bg-white hover:bg-slate-200 text-black font-bold py-1 px-4 rounded text-sm'
@@ -37,13 +41,23 @@ const session = await getSession(Astro.request)
 </nav>
 
 <script>
-  const { signIn, signOut } = await import('auth-astro/client')
+  import { createSupabaseBrowserClient } from '@/lib/supabase-browser'
+
+  const supabase = createSupabaseBrowserClient()
+
   const loginButton = document.querySelector('#login') as HTMLButtonElement
   if (loginButton) {
-    loginButton.onclick = () => signIn('twitch')
+    loginButton.onclick = () =>
+      supabase.auth.signInWithOAuth({
+        provider: 'twitch',
+        options: { redirectTo: `${window.location.origin}/api/auth/callback` },
+      })
   }
   const logoutButton = document.querySelector('#logout') as HTMLButtonElement
   if (logoutButton) {
-    logoutButton.onclick = () => signOut()
+    logoutButton.onclick = async () => {
+      await supabase.auth.signOut()
+      window.location.href = '/'
+    }
   }
 </script>

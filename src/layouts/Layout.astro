@@ -1,6 +1,5 @@
 ---
 import Navbar from 'src/components/Navbar.astro'
-import SpeedInsights from '@vercel/speed-insights/astro'
 import Footer from '@/components/Footer.astro'
 import '../styles/global.css'
 
@@ -17,7 +16,7 @@ const { title, description } = Astro.props
   <head>
     <meta charset='UTF-8' />
     <meta name='description' content={description} />
-    <meta name='viewport' content='width=device-width' />
+    <meta name='viewport' content='width=device-width, viewport-fit=cover' />
     <link rel='icon' type='image/svg+xml' href='/favicon.svg' />
     <meta name='generator' content={Astro.generator} />
     <title>{title}</title>
@@ -28,7 +27,6 @@ const { title, description } = Astro.props
       <slot />
     </main>
     <Footer />
-    <SpeedInsights />
   </body>
 </html>
 

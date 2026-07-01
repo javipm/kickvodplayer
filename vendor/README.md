@@ -14,8 +14,14 @@ npm pack --ignore-scripts` snapshot of that commit for each package in the
 dependency chain (`react` → `core` → `spf`/`store` → `utils`).
 
 Each tarball's `package.json` has its `workspace:*` cross-deps rewritten to
-absolute `file:` paths pointing at the sibling tarballs in this directory
-(only works on this machine — that's expected for a throwaway vendor pin).
+relative `file:../../../vendor/...` paths pointing at the sibling tarballs in
+this directory. npm resolves a nested dependency's `file:` specifier relative
+to where that package ends up inside `node_modules` (e.g.
+`node_modules/@videojs/react/`), not relative to the project root — hence
+the `../../../` climbing back up to the repo root before descending into
+`vendor/` again. This only holds because npm hoists each of these packages
+to a single top-level `node_modules/@videojs/<name>/` (no version
+conflicts); it would break if that ever stopped being the case.
 
 **Note**: the exact component name churns between commits — this snapshot
 uses `HlsJsVideo` from `@videojs/react/media/hlsjs-video` (renamed from

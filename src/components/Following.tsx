@@ -46,16 +46,16 @@ export default function Following() {
       <SectionHeading eyebrow='Your circle' title='Following' />
       <ul className='scroll-fade -mx-1 flex snap-x snap-mandatory gap-3 overflow-x-scroll px-1 pb-3 hide-scrollbar'>
         {streamers.map((streamer) => (
-          <li key={streamer.id} className='snap-start'>
+          <li key={streamer.id} className='shrink-0 snap-start'>
             <a
               href={`/streamer/${streamer.username.toLowerCase()}`}
               className='group flex flex-col items-center gap-1.5'
             >
-              <span className='rounded-full bg-gradient-to-tr from-signal to-ink-raised p-[2px] transition group-hover:from-white'>
+              <span className='block rounded-full bg-gradient-to-tr from-signal to-ink-raised p-[2px] transition group-hover:from-white'>
                 <img
                   src={streamer.profilepic}
                   alt=''
-                  className='h-16 w-16 rounded-full border-2 border-ink object-cover'
+                  className='block h-16 w-16 rounded-full border-2 border-ink object-cover'
                 />
               </span>
               <span className='max-w-[4.5rem] truncate font-mono text-[10px] text-white/60'>

@@ -300,7 +300,7 @@ export default function Streamer({
             />
             <div className='flex gap-4 overflow-x-scroll pb-6 hide-scrollbar sm:grid sm:grid-cols-2 sm:overflow-auto lg:grid-cols-3'>
               {videos.map((video) => (
-                <div key={video.id} className='inline-block w-80 sm:w-auto'>
+                <div key={video.id} className='w-80 shrink-0 sm:w-auto sm:shrink'>
                   {renderVideo(video)}
                 </div>
               ))}

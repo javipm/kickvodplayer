@@ -10,6 +10,25 @@ const PROGRESS_INTERVAL_SECONDS = 60
 
 const Player = createPlayer({ features: videoFeatures })
 
+function OrientationLock() {
+  const fullscreen = Player.usePlayer((state) => state.fullscreen)
+
+  useEffect(() => {
+    const orientation = screen.orientation as ScreenOrientation & {
+      lock?: (orientation: string) => Promise<void>
+    }
+    if (!orientation?.lock) return
+
+    if (fullscreen) {
+      orientation.lock('landscape').catch(() => {})
+    } else {
+      orientation.unlock?.()
+    }
+  }, [fullscreen])
+
+  return null
+}
+
 function ProgressTracker(props: {
   videoRef: React.RefObject<HTMLVideoElement | null>
   userIsLogged: boolean
@@ -75,6 +94,7 @@ export default function VideoJS(props: {
         userIsLogged={userIsLogged}
         videoUuid={videoUuid}
       />
+      <OrientationLock />
     </Player.Provider>
   )
 }

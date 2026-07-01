@@ -19,37 +19,84 @@ const { title, description } = Astro.props
     <meta name='viewport' content='width=device-width, viewport-fit=cover' />
     <link rel='icon' type='image/svg+xml' href='/favicon.svg' />
     <meta name='generator' content={Astro.generator} />
+    <link rel='preconnect' href='https://fonts.googleapis.com' />
+    <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin />
+    <link
+      href='https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap'
+      rel='stylesheet'
+    />
     <title>{title}</title>
   </head>
-  <body class='flex flex-col min-h-screen bg-black'>
+  <body class='relative flex min-h-screen flex-col bg-ink text-white'>
+    <div
+      class='grain pointer-events-none fixed inset-0 z-0 opacity-[0.04]'
+      aria-hidden='true'
+    >
+    </div>
+    <div
+      class='pointer-events-none fixed inset-0 z-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(166,255,46,0.08),transparent)]'
+      aria-hidden='true'
+    >
+    </div>
+
+    <a href='#main-content' class='skip-link'>Skip to content</a>
+
     <Navbar />
-    <main class='flex-grow'>
+    <main id='main-content' class='relative z-10 flex-grow'>
       <slot />
     </main>
     <Footer />
+
+    <div
+      id='toast-viewport'
+      class='toast-viewport'
+      aria-live='polite'
+      aria-atomic='true'
+    >
+    </div>
   </body>
 </html>
 
-<style is:global>
-  /* Firefox */
-  * {
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-green-500) var(--color-black);
+<script>
+  type ToastVariant = 'success' | 'error' | 'info'
+
+  const viewport = document.getElementById('toast-viewport')
+
+  function dismiss(el: HTMLElement) {
+    const timer = el.dataset.timer
+    if (timer) clearTimeout(Number(timer))
+    el.classList.remove('toast--visible')
+    el.addEventListener('transitionend', () => el.remove(), { once: true })
   }
 
-  /* Chrome, Edge, and Safari */
-  *::-webkit-scrollbar {
-    width: 15px;
+  function createToast(message: string, variant: ToastVariant) {
+    if (!viewport) return
+
+    const el = document.createElement('div')
+    el.className = `toast toast--${variant}`
+    el.setAttribute('role', 'status')
+
+    const text = document.createElement('span')
+    text.textContent = message
+    el.appendChild(text)
+
+    const close = document.createElement('button')
+    close.type = 'button'
+    close.setAttribute('aria-label', 'Dismiss notification')
+    close.className = 'toast__close'
+    close.textContent = '×'
+    close.onclick = () => dismiss(el)
+    el.appendChild(close)
+
+    viewport.appendChild(el)
+    requestAnimationFrame(() => el.classList.add('toast--visible'))
+
+    const timer = window.setTimeout(() => dismiss(el), 4000)
+    el.dataset.timer = String(timer)
   }
 
-  *::-webkit-scrollbar-track {
-    background: var(--color-black);
-    border-radius: 5px;
-  }
-
-  *::-webkit-scrollbar-thumb {
-    background-color: var(--color-green-500);
-    border-radius: 14px;
-    border: 3px solid var(--color-black);
-  }
-</style>
+  window.addEventListener('app:toast', (event) => {
+    const detail = (event as CustomEvent).detail ?? {}
+    createToast(detail.message ?? '', detail.variant ?? 'info')
+  })
+</script>

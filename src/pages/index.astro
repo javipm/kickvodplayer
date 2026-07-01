@@ -11,42 +11,66 @@ const userIsLogged = user !== null
   title='Kick VODs Player'
   description='Watch your favorite Kick streamers VODs with Kick VODs Player.'
 >
-  <main class='pt-2 justify-center mx-auto'>
-    <section class='max-w-screen-lg mx-auto text-white p-6'>
-      <h2 class='mb-4 text-green-500 text-4xl font-bold text-center'>
-        Welcome to Kick VODs player
-      </h2>
-      <p class='mb-2 text-white text-sm font-bold text-center'>
-        Enter the name of the streamer you want to watch and press the search
-        button to see their VODs.
-        <br />
-        If you want to mark your favorite streamers and save your playback progress,
-        you can log in with Twitch.
+  <main class='mx-auto max-w-screen-lg px-4 pb-16 pt-10 sm:px-6 sm:pt-16'>
+    <section
+      class='relative overflow-hidden rounded-lg border border-line/70 bg-ink-raised px-6 py-12 text-center sm:py-16'
+    >
+      <div
+        class='grain pointer-events-none absolute inset-0 opacity-[0.05]'
+        aria-hidden='true'
+      >
+      </div>
+
+      <p
+        class='relative font-mono text-[11px] uppercase tracking-[0.3em] text-signal/80'
+      >
+        Unofficial · Fan-made
       </p>
-    </section>
-    <section class='max-w-screen-sm mx-auto px-6'>
+      <h1
+        class='relative mx-auto mt-3 max-w-2xl text-balance font-display text-3xl font-semibold text-white sm:text-4xl lg:text-5xl'
+      >
+        Every VOD, <span class='text-signal'>picked up</span> right where you
+        left it.
+      </h1>
+      <p class='relative mx-auto mt-4 max-w-xl text-sm text-white/60 sm:text-base'>
+        Search any Kick streamer, watch their archive with a proper player,
+        and log in with Twitch to save your spot and follow your favorites.
+      </p>
+
       <form
         id='searchForm'
-        class='flex flex-row content-center place-content-center gap-2'
+        class='relative mx-auto mt-8 flex max-w-md flex-col gap-2 sm:flex-row'
+        novalidate
       >
+        <label for='streamer-search' class='sr-only'>Kick streamer name</label>
         <input
+          id='streamer-search'
           type='text'
-          placeholder='Type Kick streamer name'
+          placeholder='e.g. adinross'
           name='streamer'
-          class='w-full text-sm p-2 rounded border-2 border-gray-300 focus:outline-none focus:border-blue-500 text-white'
+          autocomplete='off'
+          class='w-full rounded-sm border border-line bg-ink px-4 py-2.5 text-sm text-white placeholder:text-white/30'
           required
         />
         <button
           type='submit'
-          class='p-2 bg-green-500 text-white font-bold rounded text-sm focus:outline-none max-w-24'
+          class='inline-flex items-center justify-center gap-2 rounded-sm bg-signal px-5 py-2.5 font-mono text-xs font-semibold uppercase tracking-wide text-ink transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60'
         >
-          Search
+          <span id='searchButtonLabel'>Search</span>
         </button>
       </form>
+
+      <p
+        id='searchError'
+        class='relative mt-3 hidden font-mono text-xs text-rec'
+        role='alert'
+      >
+      </p>
     </section>
+
     {
       userIsLogged && (
-        <section class='max-w-screen-lg mt-6 px-6 py-4 md:p-0 mx-auto'>
+        <section class='mt-12 space-y-10'>
           <Following client:load />
           <InProgress client:load />
         </section>
@@ -58,21 +82,48 @@ const userIsLogged = user !== null
 <script>
   import { getKickStreamer } from '@/lib/api'
 
-  const form = document.getElementById('searchForm')
-  if (form) {
-    form.addEventListener('submit', async function (event) {
-      event.preventDefault()
-      const input = document.querySelector(
-        'input[name="streamer"]'
-      ) as HTMLInputElement
-      const streamer = input?.value.toLowerCase()
+  const form = document.getElementById('searchForm') as HTMLFormElement | null
+  const button = form?.querySelector(
+    'button[type="submit"]'
+  ) as HTMLButtonElement | null
+  const buttonLabel = document.getElementById('searchButtonLabel')
+  const errorEl = document.getElementById('searchError')
+
+  form?.addEventListener('submit', async (event) => {
+    event.preventDefault()
+    if (!button || !buttonLabel) return
+
+    const input = form.querySelector(
+      'input[name="streamer"]'
+    ) as HTMLInputElement
+    const streamer = input?.value.trim().toLowerCase()
+    if (!streamer) return
+
+    errorEl?.classList.add('hidden')
+    button.disabled = true
+    buttonLabel.textContent = 'Searching…'
+
+    try {
       const result = await getKickStreamer(streamer)
       if (!result) {
-        alert('Streamer not found')
-        return false
+        if (errorEl) {
+          errorEl.textContent = `We couldn't find "${streamer}" on Kick. Check the spelling and try again.`
+          errorEl.classList.remove('hidden')
+        }
+        button.disabled = false
+        buttonLabel.textContent = 'Search'
+        return
       }
 
       window.location.href = `/streamer/${streamer}`
-    })
-  }
+    } catch (error) {
+      console.error(error)
+      if (errorEl) {
+        errorEl.textContent = 'Something went wrong. Please try again.'
+        errorEl.classList.remove('hidden')
+      }
+      button.disabled = false
+      buttonLabel.textContent = 'Search'
+    }
+  })
 </script>

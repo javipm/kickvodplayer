@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import type { CSSProperties } from 'react'
 import { createPlayer, videoFeatures } from '@videojs/react'
 import { VideoSkin } from '@videojs/react/video'
 import { HlsJsVideo } from '@videojs/react/media/hlsjs-video'
@@ -62,7 +63,11 @@ export default function VideoJS(props: {
 
   return (
     <Player.Provider>
-      <VideoSkin poster={poster} className='w-full aspect-video'>
+      <VideoSkin
+        poster={poster}
+        className='w-full aspect-video'
+        style={{ '--media-border-radius': '0px' } as CSSProperties}
+      >
         <HlsJsVideo ref={videoRef} src={source} autoPlay />
       </VideoSkin>
       <ProgressTracker

@@ -3,34 +3,38 @@ import InfoIcon from '@/components/icons/Info'
 import CodeIcon from '@/components/icons/Code'
 ---
 
-<footer class='text-white pb-2 pt-10'>
+<footer class='relative z-10 mt-16 border-t border-line/80'>
   <div
-    class='container mx-auto flex justify-between items-center max-w-screen-lg'
+    class='mx-auto flex max-w-screen-lg flex-col items-center gap-3 px-4 py-6 text-center sm:flex-row sm:justify-between sm:px-6 sm:text-left'
   >
-    <div>
-      <p class='text-xs'>
-        Developed by{' '}
-        <a
-          href='https://twitter.com/javipm89'
-          class='text-green-500'
-          target='_blank'
-        >
-          javipm
-        </a>
-      </p>
-    </div>
-    <div class='flex space-x-4'>
-      <a href='/about' class='text-white text-xl cursor-pointer'>
-        <InfoIcon />
+    <p class='font-mono text-[11px] uppercase tracking-wider text-white/40'>
+      Built by{' '}
+      <a
+        href='https://twitter.com/javipm89'
+        target='_blank'
+        rel='noreferrer'
+        class='text-signal transition-colors hover:text-white'
+      >
+        @javipm89
+      </a>
+    </p>
+    <div class='flex items-center gap-4 text-white/50'>
+      <a
+        href='/about'
+        aria-label='About this app'
+        class='rounded-sm transition hover:text-signal'
+      >
+        <InfoIcon className='text-lg' />
       </a>
       <a
         href='https://github.com/javipm/kickvodplayer'
         target='_blank'
-        class='text-white text-xl cursor-pointer'
+        rel='noreferrer'
+        aria-label='View source on GitHub'
+        class='rounded-sm transition hover:text-signal'
       >
-        <CodeIcon />
+        <CodeIcon className='text-lg' />
       </a>
     </div>
   </div>
 </footer>
-)

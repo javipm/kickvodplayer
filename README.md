@@ -23,15 +23,42 @@ and pick up where you left off later, even on a different device.
 Kick might block access to its content at some point, so I can't
 guarantee this app will work forever.
 
-## 💾 Technologies Used
+## 💾 Technologies Used
 
 The data is obtained using Kick's "public" API.
 
-The website is developed with the [Astro](https://astro.build/) framework and we use the [Tailwind CSS](https://tailwindcss.com/) framework to style the user interface. As the video player, we use [VideoJS](https://videojs.com/) and some plugins like [videojs-contrib-quality-levels](https://github.com/videojs/videojs-contrib-quality-levels), [videojs-hotkeys](https://github.com/ctd1500/videojs-hotkeys) and [videojs-mobile-ui](https://github.com/mister-ben/videojs-mobile-ui/tree/master). Additionally, we have used [AstroDB](https://astro.build/db/) to store the progress data of the videos and [Auth-astro](https://github.com/nowaythatworked/auth-astro) for login with Twitch.
+The website is developed with the [Astro](https://astro.build/) framework
+(v7) and we use the [Tailwind CSS](https://tailwindcss.com/) framework (v4)
+to style the user interface. As the video player, we use
+[Video.js v10](https://github.com/videojs/v10) (`@videojs/react`, currently
+in beta) — its built-in skin covers quality selection, playback speed,
+hotkeys/gestures, and mobile touch controls out of the box, so no separate
+plugins are needed anymore. See [`vendor/README.md`](vendor/README.md) for
+why a from-source build is vendored instead of installed from npm.
+
+Auth and the database are handled by [Supabase](https://supabase.com/):
+Supabase Auth (Twitch OAuth provider) for login, and Postgres with row-level
+security for follows and watch-progress data. Both used to run on
+[Astro DB](https://astro.build/db/) (now deprecated) and
+[auth-astro](https://github.com/nowaythatworked/auth-astro) (unmaintained).
 
 The website is deployed using [Vercel](https://vercel.com/)'s service.
 
 All contributions are welcome.
+
+## 🔑 Environment variables
+
+Copy `.env.default` to `.env.local` and fill in:
+
+| Variable                   | Purpose                                         |
+| :-------------------------- | :----------------------------------------------- |
+| `SUPABASE_URL`              | Your Supabase project URL                        |
+| `SUPABASE_ANON_KEY`         | Supabase anon/publishable key (server-side use)  |
+| `PUBLIC_SUPABASE_URL`       | Same URL, exposed to the browser client          |
+| `PUBLIC_SUPABASE_ANON_KEY`  | Same key, exposed to the browser client          |
+
+Twitch OAuth credentials are configured directly in the Supabase dashboard
+(Authentication → Providers → Twitch), not as env vars in this project.
 
 ## 🧞 Commands
 
